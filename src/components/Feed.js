@@ -12,7 +12,7 @@ const Feed = () => {
       try {
         const user = auth.currentUser;
         if (user) {
-          const postsCollection = collection(db, 'users');
+          const postsCollection = collection(db, 'posts');
           const postsSnapshot = await getDocs(postsCollection);
           const postsList = postsSnapshot.docs.map(doc => doc.data());
           setPosts(postsList);
@@ -30,7 +30,7 @@ const Feed = () => {
       <h2>Feed</h2>
       {posts.map((post, index) => (
         <div key={index}>
-          {post.imageUrl && <img src={post.imageUrl} alt="User Post" />}
+          {post.postImageUrl && <img src={post.postImageUrl} alt="User Post" />}
         </div>
       ))}
     </div>
