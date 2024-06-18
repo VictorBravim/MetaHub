@@ -1,19 +1,26 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
+import { getAuth } from 'firebase/auth';
 
 const Navbar = () => {
-  const { currentUser, logout } = useAuth();
+  const auth = getAuth();
+  const user = auth.currentUser;
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    auth.signOut().then(() => {
+      navigate('/login'); // Redireciona para a página de login após o logout
+    });
+  };
 
   return (
     <nav className="navbar bg-blue-500 text-white flex flex-row items-center justify-center">
-      <ul>
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/feed">Feed</Link></li>
-        {currentUser ? (
+      <ul className="flex">
+        {user ? (
           <>
+            <li><Link to="/feed">Feed</Link></li>
             <li><Link to="/profile">Profile</Link></li>
-            <li><button onClick={logout}>Logout</button></li>
+            <li><button onClick={handleLogout}>Logout</button></li>
           </>
         ) : (
           <>
