@@ -3,6 +3,7 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore, doc, getDoc, setDoc, getDocs, collection } from 'firebase/firestore';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import ProfileCard from './ProfileCard';
+import Modal from 'react-modal';
 
 const Profile = () => {
   const [profileImage, setProfileImage] = useState(null);
@@ -10,6 +11,7 @@ const Profile = () => {
   const [progress, setProgress] = useState(0);
   const [username, setUsername] = useState('');
   const [isProfileSet, setIsProfileSet] = useState(false);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
   const [postImage, setPostImage] = useState(null);
   const [postProgress, setPostProgress] = useState(0);
   const [postUrl, setPostUrl] = useState('');
@@ -29,6 +31,9 @@ const Profile = () => {
           setProfileUrl(data.imageUrl);
           setUsername(data.username);
           setIsProfileSet(!!data.imageUrl && !!data.username);
+          if (!data.imageUrl || !data.username) {
+            setModalIsOpen(true); // Abrir o modal se o perfil não estiver completo
+          }
         }
       }
     };
@@ -106,6 +111,7 @@ const Profile = () => {
         username,
       });
       setIsProfileSet(true);
+      setModalIsOpen(false); // Fechar o modal após salvar os dados do perfil
     } catch (error) {
       console.error("Error writing document: ", error);
     }
@@ -149,6 +155,7 @@ const Profile = () => {
           <div className="profile-info">
             <img src={profileUrl} alt="Profile" className="profile-image" />
             <h3>{username}</h3>
+            <button onClick={() => setModalIsOpen(true)}>Edit Profile</button>
           </div>
           <div className="post-upload">
             <h3>Upload Post</h3>
@@ -158,6 +165,9 @@ const Profile = () => {
           </div>
         </>
       ) : (
+        <p>Loading...</p>
+      )}
+      <Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)}>
         <ProfileCard 
           handleImageChange={handleProfileImageChange}
           handleUsernameChange={handleUsernameChange}
@@ -166,7 +176,7 @@ const Profile = () => {
           imageUrl={profileUrl}
           username={username}
         />
-      )}
+      </Modal>
     </div>
   );
 };
