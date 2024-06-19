@@ -2,25 +2,89 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Profile */
+
 .profile-card {
-    border: 1px solid #ddd;
-    padding: 20px;
-    margin: 20px 0;
-    border-radius: 8px;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .uploaded-image {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-  
-  .profile-image {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
+  border: 1px solid #ddd;
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.uploaded-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Post Grid */
+
+.profile .post-grid {
+  margin-top: 20px;
+}
+
+.profile .post-grid .post-item {
+  border: 1px solid #ddd;
+  padding: 5px;
+}
+
+.profile .post-grid .post-item .post-image {
+  width: 100%;
+  height: auto;
+}
+
+
+/* Feed */
+
+.feed .post {
+  border: 1px solid #ddd;
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.feed .post-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.feed .post-header .profile-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.feed .post-image {
+  width: 100%;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.feed .post-footer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.feed .post-footer button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+}
+
+.feed .post-footer .liked {
+  color: red;
+}

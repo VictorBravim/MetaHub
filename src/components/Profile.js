@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc, getDocs, collection } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, getDocs, collection, query, where } from 'firebase/firestore';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import ProfileCard from './ProfileCard';
 import Modal from 'react-modal';
@@ -12,6 +12,7 @@ const Profile = () => {
   const [username, setUsername] = useState('');
   const [isProfileSet, setIsProfileSet] = useState(false);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [posts, setPosts] = useState([]);
   const [postImage, setPostImage] = useState(null);
   const [postProgress, setPostProgress] = useState(0);
   const [postUrl, setPostUrl] = useState('');
@@ -38,6 +39,18 @@ const Profile = () => {
       }
     };
     fetchProfileData();
+  }, [user, db]);
+
+  useEffect(() => {
+    const fetchUserPosts = async () => {
+      if (user) {
+        const postsQuery = query(collection(db, 'posts'), where('userId', '==', user.uid));
+        const postsSnapshot = await getDocs(postsQuery);
+        const userPosts = postsSnapshot.docs.map(doc => doc.data());
+        setPosts(userPosts);
+      }
+    };
+    fetchUserPosts();
   }, [user, db]);
 
   const handleProfileImageChange = (e) => {
@@ -126,6 +139,7 @@ const Profile = () => {
         timestamp: Date.now()
       });
       alert('Post uploaded successfully');
+      setPosts((prevPosts) => [...prevPosts, { postImageUrl, userId: user.uid }]);
     } catch (error) {
       console.error("Error writing document: ", error);
     }
@@ -162,6 +176,16 @@ const Profile = () => {
             <input type="file" onChange={handlePostImageChange} />
             <button onClick={handlePostUpload}>Post</button>
             {postProgress > 0 && <progress value={postProgress} max="100" />}
+          </div>
+          <div className="post-grid">
+            <h3>Your Posts</h3>
+            <div className="grid grid-cols-3 gap-4">
+              {posts.map((post, index) => (
+                <div key={index} className="post-item">
+                  <img src={post.postImageUrl} alt="User Post" className="post-image" />
+                </div>
+              ))}
+            </div>
           </div>
         </>
       ) : (
