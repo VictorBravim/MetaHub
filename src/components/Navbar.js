@@ -1,22 +1,24 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getAuth } from 'firebase/auth';
+import { useAuth } from '../AuthContext';
 
 const Navbar = () => {
-  const auth = getAuth();
-  const user = auth.currentUser;
+  const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    auth.signOut().then(() => {
-      navigate('/login'); // Redireciona para a página de login após o logout
-    });
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error("Failed to log out: ", error);
+    }
   };
 
   return (
     <nav className="navbar bg-blue-500 text-white flex flex-row items-center justify-center">
       <ul className="flex">
-        {user ? (
+        {currentUser ? (
           <>
             <li><Link to="/feed">Feed</Link></li>
             <li><Link to="/profile">Profile</Link></li>

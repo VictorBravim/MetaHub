@@ -1,12 +1,11 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { getAuth } from 'firebase/auth';
+import { useAuth } from '../AuthContext'; // Assumindo que você está exportando useAuth de AuthContext
 
 const ProtectedRoute = ({ children }) => {
-  const auth = getAuth();
-  const user = auth.currentUser;
+  const { currentUser } = useAuth();
 
-  return user ? children : <Navigate to="/login" />;
+  return currentUser ? children : <Navigate to="/login" />;
 };
 
 export default ProtectedRoute;
