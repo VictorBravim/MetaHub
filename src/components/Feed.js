@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, arrayUnion, deleteDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import { FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa';
 
 const Feed = () => {
   const [posts, setPosts] = useState([]);
@@ -48,6 +48,17 @@ const Feed = () => {
     }
   };
 
+  const handleDelete = async (postId) => {
+    try {
+      const postRef = doc(db, 'posts', postId);
+      await deleteDoc(postRef);
+      setPosts(posts.filter(post => post.id !== postId));
+      console.log('Post deleted successfully.');
+    } catch (error) {
+      console.error('Error deleting post:', error);
+    }
+  };
+
   return (
     <div className="feed">
       <h2>Feed</h2>
@@ -64,6 +75,11 @@ const Feed = () => {
             <button onClick={() => handleLike(post.id)}>
               {post.likedBy && post.likedBy.includes(user.uid) ? <FaHeart className="liked" /> : <FaRegHeart />}
             </button>
+            {post.user && post.userId === user.uid && (
+              <button onClick={() => handleDelete(post.id)}>
+                <FaTrash />
+              </button>
+            )}
           </div>
         </div>
       ))}

@@ -83,8 +83,13 @@
   background: none;
   cursor: pointer;
   font-size: 1.5rem;
+  margin-right: 10px;
 }
 
 .feed .post-footer .liked {
   color: red;
+}
+
+.feed .post-footer button:last-child {
+  margin-right: 0;
 }
