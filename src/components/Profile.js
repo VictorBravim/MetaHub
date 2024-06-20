@@ -141,10 +141,12 @@ const Profile = () => {
       await setDoc(doc(postsCollection, `${user.uid}_${Date.now()}`), {
         userId: user.uid,
         postImageUrl,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        likedBy: [],
+        likeCount: 0
       });
       alert('Post uploaded successfully');
-      setPosts((prevPosts) => [...prevPosts, { postImageUrl, userId: user.uid }]);
+      setPosts((prevPosts) => [...prevPosts, { postImageUrl, userId: user.uid, likedBy: [], likeCount: 0 }]);
     } catch (error) {
       console.error("Error writing document: ", error);
     }
@@ -200,8 +202,11 @@ const Profile = () => {
       ) : (
         <p>Loading...</p>
       )}
-      <Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)}>
-        <ProfileCard 
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={() => setModalIsOpen(false)}
+      >
+        <ProfileCard
           handleImageChange={handleProfileImageChange}
           handleUsernameChange={handleUsernameChange}
           handleProfileSave={handleProfileSave}
@@ -210,6 +215,7 @@ const Profile = () => {
           username={username}
         />
       </Modal>
+
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, arrayUnion, deleteDoc } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove, deleteDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa';
 
@@ -39,12 +39,22 @@ const Feed = () => {
     const postSnapshot = await getDoc(postRef);
     const postData = postSnapshot.data();
     const likedBy = postData.likedBy || [];
+    const likeCount = postData.likeCount || 0;
 
-    if (!likedBy.includes(user.uid)) {
+    if (likedBy.includes(user.uid)) {
+      // If user has already liked the post, remove their like
       await updateDoc(postRef, {
-        likedBy: arrayUnion(user.uid)
+        likedBy: arrayRemove(user.uid),
+        likeCount: likeCount - 1
       });
-      setPosts(posts.map(post => post.id === postId ? { ...post, likedBy: [...likedBy, user.uid] } : post));
+      setPosts(posts.map(post => post.id === postId ? { ...post, likedBy: likedBy.filter(uid => uid !== user.uid), likeCount: likeCount - 1 } : post));
+    } else {
+      // If user has not liked the post, add their like
+      await updateDoc(postRef, {
+        likedBy: arrayUnion(user.uid),
+        likeCount: likeCount + 1
+      });
+      setPosts(posts.map(post => post.id === postId ? { ...post, likedBy: [...likedBy, user.uid], likeCount: likeCount + 1 } : post));
     }
   };
 
@@ -75,6 +85,7 @@ const Feed = () => {
             <button onClick={() => handleLike(post.id)}>
               {post.likedBy && post.likedBy.includes(user.uid) ? <FaHeart className="liked" /> : <FaRegHeart />}
             </button>
+            <span>{post.likeCount || 0}</span>
             {post.user && post.userId === user.uid && (
               <button onClick={() => handleDelete(post.id)}>
                 <FaTrash />

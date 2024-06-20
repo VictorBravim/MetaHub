@@ -90,6 +90,11 @@
   color: red;
 }
 
+.feed .post-footer span {
+  font-size: 1rem;
+  margin-right: 10px;
+}
+
 .feed .post-footer button:last-child {
   margin-right: 0;
 }
