@@ -16,7 +16,8 @@ const Profile = () => {
   const [postImage, setPostImage] = useState(null);
   const [postProgress, setPostProgress] = useState(0);
   const [postUrl, setPostUrl] = useState('');
-  
+  const [loading, setLoading] = useState(true);
+
   const auth = getAuth();
   const db = getFirestore();
   const storage = getStorage();
@@ -35,7 +36,11 @@ const Profile = () => {
           if (!data.imageUrl || !data.username) {
             setModalIsOpen(true); // Abrir o modal se o perfil não estiver completo
           }
+        } else {
+          // Se o documento não existir, abrir o modal para completar o perfil
+          setModalIsOpen(true);
         }
+        setLoading(false); // Finaliza o carregamento após obter os dados
       }
     };
     fetchProfileData();
@@ -95,7 +100,7 @@ const Profile = () => {
     if (postImage) {
       const storageRef = ref(storage, `postImages/${user.uid}/${postImage.name}`);
       const uploadTask = uploadBytesResumable(storageRef, postImage);
-  
+
       uploadTask.on(
         'state_changed',
         (snapshot) => {
@@ -115,7 +120,7 @@ const Profile = () => {
         }
       );
     }
-  };  
+  };
 
   const saveProfileData = async (imageUrl, username) => {
     try {
@@ -160,6 +165,10 @@ const Profile = () => {
       handleProfileUpload();
     }
   };
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <div className="profile">
