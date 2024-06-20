@@ -20,9 +20,9 @@ function Login() {
   };
 
   return (
-    <div className="container mx-auto">
+    <div className="h-screen w-full bg-black text-white flex flex-col justify-center items-center">
       <h2>Login</h2>
-      <form onSubmit={handleLogin}>
+      <form className='flex flex-col' onSubmit={handleLogin}>
         <input
           type="email"
           value={email}

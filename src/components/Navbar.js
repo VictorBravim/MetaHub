@@ -16,18 +16,18 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar bg-blue-500 text-white flex flex-row items-center justify-center">
-      <ul className="flex">
+    <nav className="fixed w-full py-6 bg-black text-white flex flex-row items-center justify-center">
+      <ul className="flex gap-3">
         {currentUser ? (
           <>
-            <li><Link to="/feed">Feed</Link></li>
-            <li><Link to="/profile">Profile</Link></li>
-            <li><button onClick={handleLogout}>Logout</button></li>
+            <li><Link to="/feed"><button className='bg-white text-black p-2 rounded-lg'>Feed</button></Link></li>
+            <li><Link to="/profile"><button className='bg-white text-black p-2 rounded-lg'>Profile</button></Link></li>
+            <li><button onClick={handleLogout} className='bg-white text-black p-2 rounded-lg'>Logout</button></li>
           </>
         ) : (
           <>
-            <li><Link to="/login">Login</Link></li>
-            <li><Link to="/signup">Signup</Link></li>
+            <li><Link to="/login"><button className='bg-white text-black p-2 rounded-lg'>Login</button></Link></li>
+            <li><Link to="/signup"><button className='bg-white text-black p-2 rounded-lg'>Signup</button></Link></li>
           </>
         )}
       </ul>

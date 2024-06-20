@@ -20,9 +20,9 @@ function Signup() {
   };
 
   return (
-    <div className="container mx-auto">
+    <div className="h-screen w-full bg-black text-white flex flex-col justify-center items-center">
       <h2>Signup</h2>
-      <form onSubmit={handleSignup}>
+      <form className='flex flex-col' onSubmit={handleSignup}>
         <input
           type="email"
           value={email}
