@@ -72,9 +72,9 @@ const Feed = () => {
       {posts.map((post, index) => (
         <div key={index} className="w-full max-w-md flex flex-col items-center mb-6">
           {post.user && (
-            <div className="w-full flex items-center mb-4 px-4">
+            <div className="w-full flex items-center mb-4 px-2">
               <img src={post.user.imageUrl} alt="User Profile" className="w-12 h-12 rounded-full mr-4" />
-              <h3>{post.user.username}</h3>
+              <h3>@{post.user.username}</h3>
             </div>
           )}
           {post.postImageUrl && <img src={post.postImageUrl} alt="User Post" className="w-full rounded-lg mb-4" />}

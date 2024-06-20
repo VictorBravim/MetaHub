@@ -201,6 +201,8 @@ const Profile = () => {
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={() => setModalIsOpen(false)}
+        className="bg-black rounded-lg p-6 max-w-lg mx-auto mt-20"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-90"
       >
         <ProfileCard
           handleImageChange={handleProfileImageChange}
