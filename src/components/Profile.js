@@ -176,7 +176,7 @@ const Profile = () => {
       {isProfileSet ? (
         <>
           <div className="profile-info flex flex-col justify-center items-center gap-2">
-            <img src={profileUrl} alt="Profile" className="profile-image" />
+            <img src={profileUrl} alt="Profile" className="w-[10%] rounded-full" />
             <h3>{username}</h3>
             <button onClick={() => setModalIsOpen(true)}>Edit Profile</button>
           </div>

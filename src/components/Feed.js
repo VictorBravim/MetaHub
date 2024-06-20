@@ -27,7 +27,7 @@ const Feed = () => {
         }));
         setPosts(postsList);
       } catch (error) {
-        console.error("Error fetching posts: ", error);
+        console.error("Erro ao buscar postagens:", error);
       }
     };
 
@@ -42,14 +42,12 @@ const Feed = () => {
     const likeCount = postData.likeCount || 0;
 
     if (likedBy.includes(user.uid)) {
-      // If user has already liked the post, remove their like
       await updateDoc(postRef, {
         likedBy: arrayRemove(user.uid),
         likeCount: likeCount - 1
       });
       setPosts(posts.map(post => post.id === postId ? { ...post, likedBy: likedBy.filter(uid => uid !== user.uid), likeCount: likeCount - 1 } : post));
     } else {
-      // If user has not liked the post, add their like
       await updateDoc(postRef, {
         likedBy: arrayUnion(user.uid),
         likeCount: likeCount + 1
@@ -63,31 +61,30 @@ const Feed = () => {
       const postRef = doc(db, 'posts', postId);
       await deleteDoc(postRef);
       setPosts(posts.filter(post => post.id !== postId));
-      console.log('Post deleted successfully.');
+      console.log('Postagem excluída com sucesso.');
     } catch (error) {
-      console.error('Error deleting post:', error);
+      console.error('Erro ao excluir postagem:', error);
     }
   };
 
   return (
-    <div className="feed">
-      <h2>Feed</h2>
+    <div className="w-full h-full flex flex-col items-center justify-center bg-black text-white pt-32">
       {posts.map((post, index) => (
-        <div key={index} className="post">
+        <div key={index} className="w-full max-w-md flex flex-col items-center mb-6">
           {post.user && (
-            <div className="post-header">
-              <img src={post.user.imageUrl} alt="User Profile" className="profile-image" />
+            <div className="w-full flex items-center mb-4 px-4">
+              <img src={post.user.imageUrl} alt="User Profile" className="w-12 h-12 rounded-full mr-4" />
               <h3>{post.user.username}</h3>
             </div>
           )}
-          {post.postImageUrl && <img src={post.postImageUrl} alt="User Post" className="post-image" />}
-          <div className="post-footer">
+          {post.postImageUrl && <img src={post.postImageUrl} alt="User Post" className="w-full rounded-lg mb-4" />}
+          <div className="w-full flex items-center px-4">
             <button onClick={() => handleLike(post.id)}>
-              {post.likedBy && post.likedBy.includes(user.uid) ? <FaHeart className="liked" /> : <FaRegHeart />}
+              {post.likedBy && post.likedBy.includes(user.uid) ? <FaHeart className="text-red-500" /> : <FaRegHeart />}
             </button>
-            <span>{post.likeCount || 0}</span>
+            <span className="ml-2">{post.likeCount || 0}</span>
             {post.user && post.userId === user.uid && (
-              <button onClick={() => handleDelete(post.id)}>
+              <button onClick={() => handleDelete(post.id)} className="ml-4">
                 <FaTrash />
               </button>
             )}
