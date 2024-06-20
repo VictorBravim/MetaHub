@@ -34,13 +34,12 @@ const Profile = () => {
           setUsername(data.username);
           setIsProfileSet(!!data.imageUrl && !!data.username);
           if (!data.imageUrl || !data.username) {
-            setModalIsOpen(true); // Abrir o modal se o perfil não estiver completo
+            setModalIsOpen(true);
           }
         } else {
-          // Se o documento não existir, abrir o modal para completar o perfil
           setModalIsOpen(true);
         }
-        setLoading(false); // Finaliza o carregamento após obter os dados
+        setLoading(false);
       }
     };
     fetchProfileData();
@@ -129,9 +128,9 @@ const Profile = () => {
         username,
       });
       setIsProfileSet(true);
-      setModalIsOpen(false); // Fechar o modal após salvar os dados do perfil
+      setModalIsOpen(false);
     } catch (error) {
-      console.error("Error writing document: ", error);
+      console.error("Erro ao escrever documento: ", error);
     }
   };
 
@@ -145,10 +144,10 @@ const Profile = () => {
         likedBy: [],
         likeCount: 0
       });
-      alert('Post uploaded successfully');
+      alert('Postagem enviada com sucesso');
       setPosts((prevPosts) => [...prevPosts, { postImageUrl, userId: user.uid, likedBy: [], likeCount: 0 }]);
     } catch (error) {
-      console.error("Error writing document: ", error);
+      console.error("Erro ao escrever documento: ", error);
     }
   };
 
@@ -161,7 +160,7 @@ const Profile = () => {
       const querySnapshot = await getDocs(collection(db, 'users'));
       const usernames = querySnapshot.docs.map(doc => doc.data().username);
       if (usernames.includes(username)) {
-        alert('Username is already taken. Please choose another one.');
+        alert('O nome de usuário já está em uso. Por favor escolha outro.');
         return;
       }
       handleProfileUpload();
@@ -173,24 +172,21 @@ const Profile = () => {
   }
 
   return (
-    <div className="profile">
-      <h2>Profile</h2>
+    <div className="profile h-full w-full flex flex-col justify-center items-center bg-black text-white pt-32">
       {isProfileSet ? (
         <>
-          <div className="profile-info">
+          <div className="profile-info flex flex-col justify-center items-center gap-2">
             <img src={profileUrl} alt="Profile" className="profile-image" />
             <h3>{username}</h3>
             <button onClick={() => setModalIsOpen(true)}>Edit Profile</button>
           </div>
-          <div className="post-upload">
-            <h3>Upload Post</h3>
-            <input type="file" onChange={handlePostImageChange} />
-            <button onClick={handlePostUpload}>Post</button>
+          <div className="post-upload mt-4">
+            <input className='p-1 rounded-lg' type="file" onChange={handlePostImageChange} />
+            <button className='bg-white text-black p-1 rounded-md ml-4' onClick={handlePostUpload}>Publicar</button>
             {postProgress > 0 && <progress value={postProgress} max="100" />}
           </div>
           <div className="post-grid">
-            <h3>Your Posts</h3>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="mx-32 grid grid-cols-4 gap-4">
               {posts.map((post, index) => (
                 <div key={index} className="post-item">
                   <img src={post.postImageUrl} alt="User Post" className="post-image" />
