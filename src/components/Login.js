@@ -21,9 +21,10 @@ function Login() {
 
   return (
     <div className="h-screen w-full bg-black text-white flex flex-col justify-center items-center">
-      <h2>Login</h2>
-      <form className='flex flex-col' onSubmit={handleLogin}>
+      <h2 className='mb-4 text-2xl'>Login</h2>
+      <form className='flex flex-col gap-6' onSubmit={handleLogin}>
         <input
+          className='rounded-lg p-2 text-black'
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -31,13 +32,14 @@ function Login() {
           required
         />
         <input
+          className='rounded-lg p-2 text-black'
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
           required
         />
-        <button type="submit">Login</button>
+        <button type="submit" className='bg-white p-2 text-black rounded-lg'>Entrar</button>
       </form>
       {error && <p>{error}</p>}
     </div>
