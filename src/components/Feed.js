@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove, deleteDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
+import { getStorage, ref, deleteObject } from 'firebase/storage';
 import { FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa';
 
 const Feed = () => {
   const [posts, setPosts] = useState([]);
   const db = getFirestore();
   const auth = getAuth();
+  const storage = getStorage();
   const user = auth.currentUser;
 
   useEffect(() => {
@@ -56,10 +58,12 @@ const Feed = () => {
     }
   };
 
-  const handleDelete = async (postId) => {
+  const handleDelete = async (postId, postImageUrl) => {
     try {
       const postRef = doc(db, 'posts', postId);
       await deleteDoc(postRef);
+      const imageRef = ref(storage, postImageUrl);
+      await deleteObject(imageRef);
       setPosts(posts.filter(post => post.id !== postId));
       console.log('Postagem excluída com sucesso.');
     } catch (error) {
@@ -84,7 +88,7 @@ const Feed = () => {
             </button>
             <span className="ml-2">{post.likeCount || 0}</span>
             {post.user && post.userId === user.uid && (
-              <button onClick={() => handleDelete(post.id)} className="ml-4">
+              <button onClick={() => handleDelete(post.id, post.postImageUrl)} className="ml-4">
                 <FaTrash />
               </button>
             )}

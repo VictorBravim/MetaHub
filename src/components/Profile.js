@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, doc, getDoc, setDoc, getDocs, collection, query, where } from 'firebase/firestore';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 import ProfileCard from './ProfileCard';
 import Modal from 'react-modal';
 
@@ -22,6 +22,7 @@ const Profile = () => {
   const db = getFirestore();
   const storage = getStorage();
   const user = auth.currentUser;
+  const [previousProfileUrl, setPreviousProfileUrl] = useState('');
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -31,6 +32,7 @@ const Profile = () => {
         if (docSnap.exists()) {
           const data = docSnap.data();
           setProfileUrl(data.imageUrl);
+          setPreviousProfileUrl(data.imageUrl);
           setUsername(data.username);
           setIsProfileSet(!!data.imageUrl && !!data.username);
           if (!data.imageUrl || !data.username) {
@@ -67,7 +69,7 @@ const Profile = () => {
     if (profileImage) {
       const storageRef = ref(storage, `profileImages/${user.uid}/${profileImage.name}`);
       const uploadTask = uploadBytesResumable(storageRef, profileImage);
-
+  
       uploadTask.on(
         'state_changed',
         (snapshot) => {
@@ -79,13 +81,61 @@ const Profile = () => {
         (error) => {
           console.log(error);
         },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-            setProfileUrl(url);
-            saveProfileData(url, username);
-          });
+        async () => {
+          const newProfileUrl = await getDownloadURL(uploadTask.snapshot.ref);
+          setProfileUrl(newProfileUrl);
+          await updateProfileData({ imageUrl: newProfileUrl });
+  
+          // Excluir imagem anterior do Firebase Storage
+          if (previousProfileUrl) {
+            const previousImageRef = ref(storage, previousProfileUrl);
+            try {
+              await deleteObject(previousImageRef);
+              console.log('Imagem anterior excluída com sucesso.');
+            } catch (error) {
+              console.error('Erro ao excluir a imagem anterior:', error);
+            }
+          }
+  
+          // Atualizar a URL da imagem anterior
+          setPreviousProfileUrl(newProfileUrl);
         }
       );
+    }
+  };
+
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value);
+  };
+
+  const handleUsernameUpdate = async () => {
+    if (username) {
+      const querySnapshot = await getDocs(collection(db, 'users'));
+      const usernames = querySnapshot.docs.map(doc => doc.data().username);
+      if (usernames.includes(username)) {
+        alert('O nome de usuário já está em uso. Por favor escolha outro.');
+        return;
+      }
+      await updateProfileData({ username });
+    }
+  };
+
+  const updateProfileData = async (data) => {
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      await setDoc(userRef, data, { merge: true });
+      setIsProfileSet(true);
+      setModalIsOpen(false);
+    } catch (error) {
+      console.error("Erro ao atualizar perfil: ", error);
+    }
+  };
+
+  const handleProfileSave = async () => {
+    if (profileImage) {
+      handleProfileUpload();
+    } else {
+      handleUsernameUpdate();
     }
   };
 
@@ -121,19 +171,6 @@ const Profile = () => {
     }
   };
 
-  const saveProfileData = async (imageUrl, username) => {
-    try {
-      await setDoc(doc(db, 'users', user.uid), {
-        imageUrl,
-        username,
-      });
-      setIsProfileSet(true);
-      setModalIsOpen(false);
-    } catch (error) {
-      console.error("Erro ao escrever documento: ", error);
-    }
-  };
-
   const savePostData = async (postImageUrl) => {
     try {
       const postsCollection = collection(db, 'posts');
@@ -148,22 +185,6 @@ const Profile = () => {
       setPosts((prevPosts) => [...prevPosts, { postImageUrl, userId: user.uid, likedBy: [], likeCount: 0 }]);
     } catch (error) {
       console.error("Erro ao escrever documento: ", error);
-    }
-  };
-
-  const handleUsernameChange = (e) => {
-    setUsername(e.target.value);
-  };
-
-  const handleProfileSave = async () => {
-    if (profileImage && username) {
-      const querySnapshot = await getDocs(collection(db, 'users'));
-      const usernames = querySnapshot.docs.map(doc => doc.data().username);
-      if (usernames.includes(username)) {
-        alert('O nome de usuário já está em uso. Por favor escolha outro.');
-        return;
-      }
-      handleProfileUpload();
     }
   };
 
@@ -213,7 +234,6 @@ const Profile = () => {
           username={username}
         />
       </Modal>
-
     </div>
   );
 };
