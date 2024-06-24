@@ -13,7 +13,6 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const auth = getAuth();
-    // Set persistence to local to ensure the user stays logged in across page reloads
     setPersistence(auth, browserLocalPersistence)
       .then(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {

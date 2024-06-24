@@ -3,7 +3,7 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore, doc, getDoc, setDoc, getDocs, collection, query, where, updateDoc, arrayUnion, arrayRemove, deleteDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 import ProfileCard from './ProfileCard';
-import PostModal from './PostModal'; // Import the new PostModal component
+import PostModal from './PostModal';
 import Modal from 'react-modal';
 
 const Profile = () => {
@@ -18,7 +18,6 @@ const Profile = () => {
   const [postProgress, setPostProgress] = useState(0);
   const [postUrl, setPostUrl] = useState('');
   const [loading, setLoading] = useState(true);
-
   const [selectedPost, setSelectedPost] = useState(null);
   const [postModalIsOpen, setPostModalIsOpen] = useState(false);
 
@@ -69,42 +68,69 @@ const Profile = () => {
     }
   };
 
-  const handleProfileUpload = () => {
+  const handleProfileUpload = async () => {
     if (profileImage) {
-      const storageRef = ref(storage, `profileImages/${user.uid}/${profileImage.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, profileImage);
-
-      uploadTask.on(
-        'state_changed',
-        (snapshot) => {
-          const progress = Math.round(
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-          );
-          setProgress(progress);
-        },
-        (error) => {
-          console.log(error);
-        },
-        async () => {
-          const newProfileUrl = await getDownloadURL(uploadTask.snapshot.ref);
-          setProfileUrl(newProfileUrl);
-          saveProfileData(newProfileUrl, username);
-
-          // Excluir imagem anterior do Firebase Storage
-          if (previousProfileUrl) {
-            const previousImageRef = ref(storage, previousProfileUrl);
-            try {
-              await deleteObject(previousImageRef);
-              console.log('Imagem anterior excluída com sucesso.');
-            } catch (error) {
-              console.error('Erro ao excluir a imagem anterior:', error);
-            }
+      try {
+        const resizedImage = await resizeImage(profileImage);
+        const storageRef = ref(storage, `profileImages/${user.uid}/${profileImage.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, resizedImage);
+  
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {
+            const progress = Math.round(
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+            );
+            setProgress(progress);
+          },
+          (error) => {
+            console.log(error);
+          },
+          async () => {
+            const newProfileUrl = await getDownloadURL(uploadTask.snapshot.ref);
+            setProfileUrl(newProfileUrl);
+            // Salvar a URL da imagem de perfil aqui, se necessário
+            setModalIsOpen(false); // Fechar o modal após o upload
           }
+        );
+      } catch (error) {
+        console.error('Erro ao redimensionar imagem:', error);
+      }
+    }
+  };
 
-          // Atualizar a URL da imagem anterior
-          setPreviousProfileUrl(newProfileUrl);
-        }
-      );
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value);
+  };
+
+  const handleUsernameUpdate = async () => {
+    if (username) {
+      const querySnapshot = await getDocs(collection(db, 'users'));
+      const usernames = querySnapshot.docs.map(doc => doc.data().username);
+      if (usernames.includes(username)) {
+        alert('O nome de usuário já está em uso. Por favor escolha outro.');
+        return;
+      }
+      await updateProfileData({ username });
+    }
+  };
+
+  const updateProfileData = async (data) => {
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      await setDoc(userRef, data, { merge: true });
+      setIsProfileSet(true);
+      setModalIsOpen(false);
+    } catch (error) {
+      console.error("Erro ao atualizar perfil: ", error);
+    }
+  };
+
+  const handleProfileSave = async () => {
+    if (profileImage) {
+      handleProfileUpload();
+    } else {
+      handleUsernameUpdate();
     }
   };
 
@@ -114,81 +140,56 @@ const Profile = () => {
     }
   };
 
-  const handlePostUpload = () => {
+  const handlePostUpload = async () => {
     if (postImage) {
-      const storageRef = ref(storage, `postImages/${user.uid}/${postImage.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, postImage);
-
-      uploadTask.on(
-        'state_changed',
-        (snapshot) => {
-          const progress = Math.round(
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-          );
-          setPostProgress(progress);
-        },
-        (error) => {
-          console.log(error);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-            setPostUrl(url);
-            savePostData(url);
-          });
-        }
-      );
-    }
-  };
-
-  const saveProfileData = async (imageUrl, username) => {
-    try {
-      await setDoc(doc(db, 'users', user.uid), {
-        imageUrl,
-        username,
-      });
-      setIsProfileSet(true);
-      setModalIsOpen(false);
-    } catch (error) {
-      console.error("Erro ao escrever documento: ", error);
+      try {
+        const resizedImage = await resizeImage(postImage);
+        const storageRef = ref(storage, `postImages/${user.uid}/${postImage.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, resizedImage);
+  
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {
+            const progress = Math.round(
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+            );
+            setPostProgress(progress);
+          },
+          (error) => {
+            console.log(error);
+          },
+          async () => {
+            const postImageUrl = await getDownloadURL(uploadTask.snapshot.ref);
+            savePostData(postImageUrl); // Salvar dados da postagem
+          }
+        );
+      } catch (error) {
+        console.error('Erro ao redimensionar imagem:', error);
+      }
     }
   };
 
   const savePostData = async (postImageUrl) => {
     try {
       const postsCollection = collection(db, 'posts');
-      const newPost = {
+      await setDoc(doc(postsCollection, `${user.uid}_${Date.now()}`), {
         userId: user.uid,
         postImageUrl,
         timestamp: Date.now(),
         likedBy: [],
         likeCount: 0
-      };
-      await setDoc(doc(postsCollection, `${user.uid}_${Date.now()}`), newPost);
+      });
       alert('Postagem enviada com sucesso');
-      setPosts((prevPosts) => [...prevPosts, newPost]);
+      setPosts((prevPosts) => [...prevPosts, { postImageUrl, userId: user.uid, likedBy: [], likeCount: 0 }]);
     } catch (error) {
       console.error("Erro ao escrever documento: ", error);
     }
   };
 
-  const handleUsernameChange = (e) => {
-    setUsername(e.target.value);
-  };
-
-  const handleProfileSave = async () => {
-    if (profileImage && username) {
-      const querySnapshot = await getDocs(collection(db, 'users'));
-      const usernames = querySnapshot.docs.map(doc => doc.data().username);
-      if (usernames.includes(username)) {
-        alert('O nome de usuário já está em uso. Por favor escolha outro.');
-        return;
-      }
-      handleProfileUpload();
-    }
-  };
-
-  const handleLikePost = async (post) => {
-    const postRef = doc(db, 'posts', post.id);
+  const handleLikePost = async (postId) => {
+    const postRef = doc(db, 'posts', postId);
+    const postDoc = await getDoc(postRef);
+    const post = postDoc.data();
     const userLiked = post.likedBy.includes(user.uid);
 
     try {
@@ -206,29 +207,85 @@ const Profile = () => {
 
       setPosts((prevPosts) =>
         prevPosts.map((p) =>
-          p.id === post.id
+          p.id === postId
             ? { ...p, likedBy: userLiked ? p.likedBy.filter((id) => id !== user.uid) : [...p.likedBy, user.uid], likeCount: userLiked ? p.likeCount - 1 : p.likeCount + 1 }
             : p
         )
       );
+
+      if (selectedPost && selectedPost.id === postId) {
+        setSelectedPost((prevSelectedPost) => ({
+          ...prevSelectedPost,
+          likedBy: userLiked ? prevSelectedPost.likedBy.filter((id) => id !== user.uid) : [...prevSelectedPost.likedBy, user.uid],
+          likeCount: userLiked ? prevSelectedPost.likeCount - 1 : prevSelectedPost.likeCount + 1
+        }));
+      }
+
     } catch (error) {
       console.error('Erro ao atualizar like:', error);
     }
   };
 
-  const handleDeletePost = async (post) => {
-    const postRef = doc(db, 'posts', post.id);
-    const imageRef = ref(storage, post.postImageUrl);
+  const handleDeletePost = async (postId, postImageUrl) => {
+    const postRef = doc(db, 'posts', postId);
+    const imageRef = ref(storage, postImageUrl);
 
     try {
       await deleteDoc(postRef);
       await deleteObject(imageRef);
-      setPosts((prevPosts) => prevPosts.filter((p) => p.id !== post.id));
+      setPosts((prevPosts) => prevPosts.filter((p) => p.id !== postId));
       closePostModal(); // Fechar o modal após excluir
     } catch (error) {
       console.error('Erro ao excluir post:', error);
     }
   };
+
+  const resizeImage = async (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const MAX_WIDTH = 1080;
+          const MAX_HEIGHT = 1080;
+          let width = img.width;
+          let height = img.height;
+  
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+  
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+  
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+  
+          canvas.toBlob(
+            (blob) => {
+              resolve(blob);
+            },
+            file.type,
+            0.7 // qualidade da imagem (opcional, ajuste conforme necessário)
+          );
+        };
+      };
+      reader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };  
 
   const openPostModal = (post) => {
     setSelectedPost(post);
