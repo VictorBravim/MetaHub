@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc, getDocs, collection, query, where } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, getDocs, collection, query, where, updateDoc, arrayUnion, arrayRemove, deleteDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 import ProfileCard from './ProfileCard';
+import PostModal from './PostModal'; // Import the new PostModal component
 import Modal from 'react-modal';
 
 const Profile = () => {
@@ -17,6 +18,9 @@ const Profile = () => {
   const [postProgress, setPostProgress] = useState(0);
   const [postUrl, setPostUrl] = useState('');
   const [loading, setLoading] = useState(true);
+
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [postModalIsOpen, setPostModalIsOpen] = useState(false);
 
   const auth = getAuth();
   const db = getFirestore();
@@ -52,7 +56,7 @@ const Profile = () => {
       if (user) {
         const postsQuery = query(collection(db, 'posts'), where('userId', '==', user.uid));
         const postsSnapshot = await getDocs(postsQuery);
-        const userPosts = postsSnapshot.docs.map(doc => doc.data());
+        const userPosts = postsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setPosts(userPosts);
       }
     };
@@ -65,11 +69,11 @@ const Profile = () => {
     }
   };
 
-  const handleProfileUpload = async () => {
+  const handleProfileUpload = () => {
     if (profileImage) {
-      const resizedImage = await resizeImage(profileImage);
       const storageRef = ref(storage, `profileImages/${user.uid}/${profileImage.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, resizedImage);
+      const uploadTask = uploadBytesResumable(storageRef, profileImage);
+
       uploadTask.on(
         'state_changed',
         (snapshot) => {
@@ -84,7 +88,9 @@ const Profile = () => {
         async () => {
           const newProfileUrl = await getDownloadURL(uploadTask.snapshot.ref);
           setProfileUrl(newProfileUrl);
-          await updateProfileData({ imageUrl: newProfileUrl });
+          saveProfileData(newProfileUrl, username);
+
+          // Excluir imagem anterior do Firebase Storage
           if (previousProfileUrl) {
             const previousImageRef = ref(storage, previousProfileUrl);
             try {
@@ -94,44 +100,11 @@ const Profile = () => {
               console.error('Erro ao excluir a imagem anterior:', error);
             }
           }
+
+          // Atualizar a URL da imagem anterior
           setPreviousProfileUrl(newProfileUrl);
         }
       );
-    }
-  };
-
-  const handleUsernameChange = (e) => {
-    setUsername(e.target.value);
-  };
-
-  const handleUsernameUpdate = async () => {
-    if (username) {
-      const querySnapshot = await getDocs(collection(db, 'users'));
-      const usernames = querySnapshot.docs.map(doc => doc.data().username);
-      if (usernames.includes(username)) {
-        alert('O nome de usuário já está em uso. Por favor escolha outro.');
-        return;
-      }
-      await updateProfileData({ username });
-    }
-  };
-
-  const updateProfileData = async (data) => {
-    try {
-      const userRef = doc(db, 'users', user.uid);
-      await setDoc(userRef, data, { merge: true });
-      setIsProfileSet(true);
-      setModalIsOpen(false);
-    } catch (error) {
-      console.error("Erro ao atualizar perfil: ", error);
-    }
-  };
-
-  const handleProfileSave = async () => {
-    if (profileImage) {
-      handleProfileUpload();
-    } else {
-      handleUsernameUpdate();
     }
   };
 
@@ -145,6 +118,7 @@ const Profile = () => {
     if (postImage) {
       const storageRef = ref(storage, `postImages/${user.uid}/${postImage.name}`);
       const uploadTask = uploadBytesResumable(storageRef, postImage);
+
       uploadTask.on(
         'state_changed',
         (snapshot) => {
@@ -166,58 +140,104 @@ const Profile = () => {
     }
   };
 
-  const savePostData = async (postImageUrl) => {
+  const saveProfileData = async (imageUrl, username) => {
     try {
-      const postsCollection = collection(db, 'posts');
-      await setDoc(doc(postsCollection, `${user.uid}_${Date.now()}`), {
-        userId: user.uid,
-        postImageUrl,
-        timestamp: Date.now(),
-        likedBy: [],
-        likeCount: 0
+      await setDoc(doc(db, 'users', user.uid), {
+        imageUrl,
+        username,
       });
-      alert('Postagem enviada com sucesso');
-      setPosts((prevPosts) => [...prevPosts, { postImageUrl, userId: user.uid, likedBy: [], likeCount: 0 }]);
+      setIsProfileSet(true);
+      setModalIsOpen(false);
     } catch (error) {
       console.error("Erro ao escrever documento: ", error);
     }
   };
 
-  const resizeImage = (file) => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target.result;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 1080;
-          const MAX_HEIGHT = 1080;
-          let width = img.width;
-          let height = img.height;
-
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height *= MAX_WIDTH / width;
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width *= MAX_HEIGHT / height;
-              height = MAX_HEIGHT;
-            }
-          }
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-          canvas.toBlob((blob) => {
-            resolve(blob);
-          }, file.type);
-        };
+  const savePostData = async (postImageUrl) => {
+    try {
+      const postsCollection = collection(db, 'posts');
+      const newPost = {
+        userId: user.uid,
+        postImageUrl,
+        timestamp: Date.now(),
+        likedBy: [],
+        likeCount: 0
       };
-    });
+      await setDoc(doc(postsCollection, `${user.uid}_${Date.now()}`), newPost);
+      alert('Postagem enviada com sucesso');
+      setPosts((prevPosts) => [...prevPosts, newPost]);
+    } catch (error) {
+      console.error("Erro ao escrever documento: ", error);
+    }
+  };
+
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value);
+  };
+
+  const handleProfileSave = async () => {
+    if (profileImage && username) {
+      const querySnapshot = await getDocs(collection(db, 'users'));
+      const usernames = querySnapshot.docs.map(doc => doc.data().username);
+      if (usernames.includes(username)) {
+        alert('O nome de usuário já está em uso. Por favor escolha outro.');
+        return;
+      }
+      handleProfileUpload();
+    }
+  };
+
+  const handleLikePost = async (post) => {
+    const postRef = doc(db, 'posts', post.id);
+    const userLiked = post.likedBy.includes(user.uid);
+
+    try {
+      if (userLiked) {
+        await updateDoc(postRef, {
+          likedBy: arrayRemove(user.uid),
+          likeCount: post.likeCount - 1
+        });
+      } else {
+        await updateDoc(postRef, {
+          likedBy: arrayUnion(user.uid),
+          likeCount: post.likeCount + 1
+        });
+      }
+
+      setPosts((prevPosts) =>
+        prevPosts.map((p) =>
+          p.id === post.id
+            ? { ...p, likedBy: userLiked ? p.likedBy.filter((id) => id !== user.uid) : [...p.likedBy, user.uid], likeCount: userLiked ? p.likeCount - 1 : p.likeCount + 1 }
+            : p
+        )
+      );
+    } catch (error) {
+      console.error('Erro ao atualizar like:', error);
+    }
+  };
+
+  const handleDeletePost = async (post) => {
+    const postRef = doc(db, 'posts', post.id);
+    const imageRef = ref(storage, post.postImageUrl);
+
+    try {
+      await deleteDoc(postRef);
+      await deleteObject(imageRef);
+      setPosts((prevPosts) => prevPosts.filter((p) => p.id !== post.id));
+      closePostModal(); // Fechar o modal após excluir
+    } catch (error) {
+      console.error('Erro ao excluir post:', error);
+    }
+  };
+
+  const openPostModal = (post) => {
+    setSelectedPost(post);
+    setPostModalIsOpen(true);
+  };
+
+  const closePostModal = () => {
+    setPostModalIsOpen(false);
+    setSelectedPost(null);
   };
 
   if (loading) {
@@ -229,7 +249,7 @@ const Profile = () => {
       {isProfileSet ? (
         <>
           <div className="profile-info flex flex-col justify-center items-center gap-2">
-            <img src={profileUrl} alt="Profile" className="w-[10%] rounded-full" />
+            <img src={profileUrl} alt="Profile" className="w-[10%] h-auto rounded-full" />
             <h3>{username}</h3>
             <button onClick={() => setModalIsOpen(true)}>Edit Profile</button>
           </div>
@@ -241,8 +261,8 @@ const Profile = () => {
           <div className="post-grid">
             <div className="mx-32 grid grid-cols-4 gap-4">
               {posts.map((post, index) => (
-                <div key={index} className="post-item">
-                  <img src={post.postImageUrl} alt="User Post" className="post-image" />
+                <div key={index} className="post-item" onClick={() => openPostModal(post)}>
+                  <img src={post.postImageUrl} alt="User Post" className="w-full h-auto" />
                 </div>
               ))}
             </div>
@@ -266,6 +286,14 @@ const Profile = () => {
           username={username}
         />
       </Modal>
+      <PostModal
+        isOpen={postModalIsOpen}
+        onRequestClose={closePostModal}
+        post={selectedPost}
+        onLike={handleLikePost}
+        onDelete={handleDeletePost}
+        userLiked={selectedPost && selectedPost.likedBy.includes(user.uid)}
+      />
     </div>
   );
 };
