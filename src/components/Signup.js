@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth, db } from '../firebase'; // Certifique-se de estar importando db corretamente
+import { doc, setDoc } from 'firebase/firestore';
 
 function Signup() {
   const [email, setEmail] = useState('');
@@ -12,8 +13,18 @@ function Signup() {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      navigate('/profile');
+      // Cria o usuário no Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      // Após criar o usuário com sucesso, salva os dados no Firestore
+      await setDoc(doc(db, 'users', userCredential.user.uid), {
+        email: userCredential.user.email,
+        username: '', // Defina um valor inicial para o username se necessário
+        imageUrl: '', // Defina um valor inicial para a imageUrl se necessário
+      });
+
+      // Redireciona para a página de perfil após o cadastro
+      navigate(`/profile/${userCredential.user.uid}`);
     } catch (error) {
       setError(error.message);
     }
@@ -39,7 +50,7 @@ function Signup() {
           placeholder="Password"
           required
         />
-        <button type="submit" className='bg-white p-2 text-black rounded-lg'>Entrar</button>
+        <button type="submit" className='bg-white p-2 text-black rounded-lg'>Signup</button>
       </form>
       {error && <p>{error}</p>}
     </div>

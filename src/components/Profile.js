@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, doc, getDoc, setDoc, getDocs, collection, query, where, updateDoc, arrayUnion, arrayRemove, deleteDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
@@ -6,13 +7,13 @@ import ProfileCard from './ProfileCard';
 import PostModal from './PostModal';
 import Modal from 'react-modal';
 import FollowButton from './FollowButton'; // Importe o componente FollowButton aqui
-import { Link } from 'react-router-dom'; // Importe o Link do React Router Dom
 
 const Profile = () => {
+  const { uid } = useParams(); // Obtém o UID da URL
+  const [username, setUsername] = useState(''); // Defina o estado inicial de username
   const [profileImage, setProfileImage] = useState(null);
   const [profileUrl, setProfileUrl] = useState('');
   const [progress, setProgress] = useState(0);
-  const [username, setUsername] = useState('');
   const [isProfileSet, setIsProfileSet] = useState(false);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [posts, setPosts] = useState([]);
@@ -27,18 +28,17 @@ const Profile = () => {
   const auth = getAuth();
   const db = getFirestore();
   const storage = getStorage();
-  const user = auth.currentUser;
 
   useEffect(() => {
     const fetchProfileData = async () => {
-      if (user) {
-        const docRef = doc(db, 'users', user.uid);
+      if (uid) {
+        const docRef = doc(db, 'users', uid);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
           setProfileUrl(data.imageUrl);
           setPreviousProfileUrl(data.imageUrl);
-          setUsername(data.username);
+          setUsername(data.username); // Defina o username aqui
           setIsProfileSet(!!data.imageUrl && !!data.username);
           if (!data.imageUrl || !data.username) {
             setModalIsOpen(true);
@@ -50,19 +50,19 @@ const Profile = () => {
       }
     };
     fetchProfileData();
-  }, [user, db]);
+  }, [uid, db]);
 
   useEffect(() => {
     const fetchUserPosts = async () => {
-      if (user) {
-        const postsQuery = query(collection(db, 'posts'), where('userId', '==', user.uid));
+      if (uid) {
+        const postsQuery = query(collection(db, 'posts'), where('userId', '==', uid));
         const postsSnapshot = await getDocs(postsQuery);
         const userPosts = postsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setPosts(userPosts);
       }
     };
     fetchUserPosts();
-  }, [user, db]);
+  }, [uid, db]);
 
   const handleProfileImageChange = (e) => {
     if (e.target.files[0]) {
@@ -78,11 +78,11 @@ const Profile = () => {
           await deleteObject(previousImageRef);
           console.log('Imagem anterior excluída com sucesso.');
         }
-  
+
         const resizedImage = await resizeImage(profileImage);
-        const storageRef = ref(storage, `profileImages/${user.uid}/${profileImage.name}`);
+        const storageRef = ref(storage, `profileImages/${uid}/${profileImage.name}`);
         const uploadTask = uploadBytesResumable(storageRef, resizedImage);
-  
+
         uploadTask.on(
           'state_changed',
           (snapshot) => {
@@ -97,7 +97,7 @@ const Profile = () => {
           async () => {
             const newProfileUrl = await getDownloadURL(uploadTask.snapshot.ref);
             setProfileUrl(newProfileUrl);
-            saveProfileData(newProfileUrl, username); 
+            saveProfileData(newProfileUrl, username);
             setPreviousProfileUrl(newProfileUrl);
             setModalIsOpen(false);
           }
@@ -110,7 +110,7 @@ const Profile = () => {
 
   const saveProfileData = async (imageUrl, username) => {
     try {
-      const userRef = doc(db, 'users', user.uid);
+      const userRef = doc(db, 'users', uid);
       await setDoc(userRef, { imageUrl, username }, { merge: true });
       setIsProfileSet(true);
       console.log('Perfil atualizado com sucesso.');
@@ -137,7 +137,7 @@ const Profile = () => {
 
   const updateProfileData = async (data) => {
     try {
-      const userRef = doc(db, 'users', user.uid);
+      const userRef = doc(db, 'users', uid);
       await setDoc(userRef, data, { merge: true });
       setIsProfileSet(true);
       setModalIsOpen(false);
@@ -164,9 +164,9 @@ const Profile = () => {
     if (postImage) {
       try {
         const resizedImage = await resizeImage(postImage);
-        const storageRef = ref(storage, `postImages/${user.uid}/${postImage.name}`);
+        const storageRef = ref(storage, `postImages/${uid}/${postImage.name}`);
         const uploadTask = uploadBytesResumable(storageRef, resizedImage);
-  
+
         uploadTask.on(
           'state_changed',
           (snapshot) => {
@@ -180,7 +180,7 @@ const Profile = () => {
           },
           async () => {
             const postImageUrl = await getDownloadURL(uploadTask.snapshot.ref);
-            savePostData(postImageUrl); 
+            savePostData(postImageUrl);
           }
         );
       } catch (error) {
@@ -192,15 +192,15 @@ const Profile = () => {
   const savePostData = async (postImageUrl) => {
     try {
       const postsCollection = collection(db, 'posts');
-      await setDoc(doc(postsCollection, `${user.uid}_${Date.now()}`), {
-        userId: user.uid,
+      await setDoc(doc(postsCollection, `${uid}_${Date.now()}`), {
+        userId: uid,
         postImageUrl,
         timestamp: Date.now(),
         likedBy: [],
         likeCount: 0
       });
       alert('Postagem enviada com sucesso');
-      setPosts((prevPosts) => [...prevPosts, { postImageUrl, userId: user.uid, likedBy: [], likeCount: 0 }]);
+      setPosts((prevPosts) => [...prevPosts, { postImageUrl, userId: uid, likedBy: [], likeCount: 0 }]);
     } catch (error) {
       console.error("Erro ao escrever documento: ", error);
     }
@@ -210,17 +210,17 @@ const Profile = () => {
     const postRef = doc(db, 'posts', postId);
     const postDoc = await getDoc(postRef);
     const post = postDoc.data();
-    const userLiked = post.likedBy.includes(user.uid);
+    const userLiked = post.likedBy.includes(uid);
 
     try {
       if (userLiked) {
         await updateDoc(postRef, {
-          likedBy: arrayRemove(user.uid),
+          likedBy: arrayRemove(uid),
           likeCount: post.likeCount - 1
         });
       } else {
         await updateDoc(postRef, {
-          likedBy: arrayUnion(user.uid),
+          likedBy: arrayUnion(uid),
           likeCount: post.likeCount + 1
         });
       }
@@ -228,7 +228,7 @@ const Profile = () => {
       setPosts((prevPosts) =>
         prevPosts.map((p) =>
           p.id === postId
-            ? { ...p, likedBy: userLiked ? p.likedBy.filter((id) => id !== user.uid) : [...p.likedBy, user.uid], likeCount: userLiked ? p.likeCount - 1 : p.likeCount + 1 }
+            ? { ...p, likedBy: userLiked ? p.likedBy.filter((id) => id !== uid) : [...p.likedBy, uid], likeCount: userLiked ? p.likeCount - 1 : p.likeCount + 1 }
             : p
         )
       );
@@ -236,7 +236,7 @@ const Profile = () => {
       if (selectedPost && selectedPost.id === postId) {
         setSelectedPost((prevSelectedPost) => ({
           ...prevSelectedPost,
-          likedBy: userLiked ? prevSelectedPost.likedBy.filter((id) => id !== user.uid) : [...prevSelectedPost.likedBy, user.uid],
+          likedBy: userLiked ? prevSelectedPost.likedBy.filter((id) => id !== uid) : [...prevSelectedPost.likedBy, uid],
           likeCount: userLiked ? prevSelectedPost.likeCount - 1 : prevSelectedPost.likeCount + 1
         }));
       }
@@ -272,7 +272,7 @@ const Profile = () => {
           const MAX_HEIGHT = 1080;
           let width = img.width;
           let height = img.height;
-  
+
           if (width > height) {
             if (width > MAX_WIDTH) {
               height *= MAX_WIDTH / width;
@@ -284,20 +284,20 @@ const Profile = () => {
               height = MAX_HEIGHT;
             }
           }
-  
+
           const canvas = document.createElement('canvas');
           canvas.width = width;
           canvas.height = height;
-  
+
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
-  
+
           canvas.toBlob(
             (blob) => {
               resolve(blob);
             },
             file.type,
-            0.7 
+            0.7
           );
         };
       };
@@ -326,7 +326,7 @@ const Profile = () => {
       {isProfileSet ? (
         <>
           <div className="profile-info flex flex-col justify-center items-center gap-2">
-            <FollowButton userId={user.uid} isProfileOwner={true} />
+            <FollowButton userId={uid} isProfileOwner={true} />
             <img src={profileUrl} alt="Profile" className="w-[10%] h-auto rounded-full" />
             <h3>{username}</h3>
             <button onClick={() => setModalIsOpen(true)}>Edit Profile</button>
@@ -370,7 +370,7 @@ const Profile = () => {
         post={selectedPost}
         onLike={handleLikePost}
         onDelete={handleDeletePost}
-        userLiked={selectedPost && selectedPost.likedBy.includes(user.uid)}
+        userLiked={selectedPost && selectedPost.likedBy.includes(uid)}
       />
     </div>
   );

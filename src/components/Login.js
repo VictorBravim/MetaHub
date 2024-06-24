@@ -12,8 +12,11 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate('/profile');
+      // Realiza o login com email e senha
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      // Redireciona para o perfil com o uid correspondente
+      navigate(`/profile/${userCredential.user.uid}`);
     } catch (error) {
       setError(error.message);
     }

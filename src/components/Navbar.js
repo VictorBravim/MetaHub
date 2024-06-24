@@ -1,10 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
 const Navbar = () => {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
+  const [uid, setUid] = useState('');
+
+  useEffect(() => {
+    const fetchUid = async () => {
+      if (currentUser) {
+        setUid(currentUser.uid);
+      }
+    };
+    fetchUid();
+  }, [currentUser]);
 
   const handleLogout = async () => {
     try {
@@ -21,7 +32,7 @@ const Navbar = () => {
         {currentUser ? (
           <>
             <li><Link to="/feed"><button className='bg-white text-black p-2 rounded-lg'>Feed</button></Link></li>
-            <li><Link to="/profile"><button className='bg-white text-black p-2 rounded-lg'>Profile</button></Link></li>
+            <li><Link to={`/profile/${uid}`}><button className='bg-white text-black p-2 rounded-lg'>Profile</button></Link></li>
             <li><button onClick={handleLogout} className='bg-white text-black p-2 rounded-lg'>Logout</button></li>
           </>
         ) : (

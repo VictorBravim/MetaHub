@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove, deleteDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getStorage, ref, deleteObject } from 'firebase/storage';
+import { Link } from 'react-router-dom'; // Importe o Link do React Router Dom
 import { FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa';
 
 const Feed = () => {
@@ -24,7 +25,7 @@ const Feed = () => {
           return {
             id: postDoc.id,
             ...postData,
-            user: userData,
+            user: userData, // Certifique-se de que userData está sendo atribuído corretamente aqui
           };
         }));
         setPosts(postsList);
@@ -75,8 +76,10 @@ const Feed = () => {
         <div key={index} className="w-full max-w-md flex flex-col items-center mb-6">
           {post.user && (
             <div className="w-full flex items-center mb-4 px-2">
-              <img src={post.user.imageUrl} alt="User Profile" className="w-12 h-12 rounded-full mr-4" />
-              <h3>@{post.user.username}</h3>
+              <Link to={`/profile/${post.user.userId}`} className="flex items-center">
+                <img src={post.user.imageUrl} alt="User Profile" className="w-12 h-12 rounded-full mr-4" />
+                <h3>@{post.user.username}</h3>
+              </Link>
             </div>
           )}
           {post.postImageUrl && <img src={post.postImageUrl} alt="User Post" className="w-full rounded-lg mb-4" />}
