@@ -20,12 +20,12 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [selectedPost, setSelectedPost] = useState(null);
   const [postModalIsOpen, setPostModalIsOpen] = useState(false);
+  const [previousProfileUrl, setPreviousProfileUrl] = useState('');
 
   const auth = getAuth();
   const db = getFirestore();
   const storage = getStorage();
   const user = auth.currentUser;
-  const [previousProfileUrl, setPreviousProfileUrl] = useState('');
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -71,6 +71,12 @@ const Profile = () => {
   const handleProfileUpload = async () => {
     if (profileImage) {
       try {
+        if (previousProfileUrl) {
+          const previousImageRef = ref(storage, previousProfileUrl);
+          await deleteObject(previousImageRef);
+          console.log('Imagem anterior excluída com sucesso.');
+        }
+  
         const resizedImage = await resizeImage(profileImage);
         const storageRef = ref(storage, `profileImages/${user.uid}/${profileImage.name}`);
         const uploadTask = uploadBytesResumable(storageRef, resizedImage);
@@ -89,13 +95,25 @@ const Profile = () => {
           async () => {
             const newProfileUrl = await getDownloadURL(uploadTask.snapshot.ref);
             setProfileUrl(newProfileUrl);
-            // Salvar a URL da imagem de perfil aqui, se necessário
-            setModalIsOpen(false); // Fechar o modal após o upload
+            saveProfileData(newProfileUrl, username); 
+            setPreviousProfileUrl(newProfileUrl);
+            setModalIsOpen(false);
           }
         );
       } catch (error) {
         console.error('Erro ao redimensionar imagem:', error);
       }
+    }
+  };
+
+  const saveProfileData = async (imageUrl, username) => {
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      await setDoc(userRef, { imageUrl, username }, { merge: true });
+      setIsProfileSet(true);
+      console.log('Perfil atualizado com sucesso.');
+    } catch (error) {
+      console.error('Erro ao salvar dados do perfil:', error);
     }
   };
 
@@ -160,7 +178,7 @@ const Profile = () => {
           },
           async () => {
             const postImageUrl = await getDownloadURL(uploadTask.snapshot.ref);
-            savePostData(postImageUrl); // Salvar dados da postagem
+            savePostData(postImageUrl); 
           }
         );
       } catch (error) {
@@ -234,7 +252,7 @@ const Profile = () => {
       await deleteDoc(postRef);
       await deleteObject(imageRef);
       setPosts((prevPosts) => prevPosts.filter((p) => p.id !== postId));
-      closePostModal(); // Fechar o modal após excluir
+      closePostModal();
     } catch (error) {
       console.error('Erro ao excluir post:', error);
     }
@@ -277,7 +295,7 @@ const Profile = () => {
               resolve(blob);
             },
             file.type,
-            0.7 // qualidade da imagem (opcional, ajuste conforme necessário)
+            0.7 
           );
         };
       };
@@ -285,7 +303,7 @@ const Profile = () => {
         reject(error);
       };
     });
-  };  
+  };
 
   const openPostModal = (post) => {
     setSelectedPost(post);
