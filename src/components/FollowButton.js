@@ -1,7 +1,5 @@
-// components/FollowButton.js
-
 import React, { useState, useEffect } from 'react';
-import { getFirestore, doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { getFirestore, doc, updateDoc, arrayUnion, arrayRemove, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 const FollowButton = ({ userId, isProfileOwner }) => {

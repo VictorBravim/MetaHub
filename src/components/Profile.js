@@ -6,6 +6,7 @@ import ProfileCard from './ProfileCard';
 import PostModal from './PostModal';
 import Modal from 'react-modal';
 import FollowButton from './FollowButton'; // Importe o componente FollowButton aqui
+import { Link } from 'react-router-dom'; // Importe o Link do React Router Dom
 
 const Profile = () => {
   const [profileImage, setProfileImage] = useState(null);
