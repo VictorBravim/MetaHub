@@ -32,7 +32,6 @@ const Feed = () => {
         console.error("Erro ao buscar postagens:", error);
       }
     };
-
     fetchPosts();
   }, [db]);
 
@@ -42,7 +41,6 @@ const Feed = () => {
     const postData = postSnapshot.data();
     const likedBy = postData.likedBy || [];
     const likeCount = postData.likeCount || 0;
-
     if (likedBy.includes(user.uid)) {
       await updateDoc(postRef, {
         likedBy: arrayRemove(user.uid),

@@ -70,7 +70,6 @@ const Profile = () => {
       const resizedImage = await resizeImage(profileImage);
       const storageRef = ref(storage, `profileImages/${user.uid}/${profileImage.name}`);
       const uploadTask = uploadBytesResumable(storageRef, resizedImage);
-
       uploadTask.on(
         'state_changed',
         (snapshot) => {
@@ -86,8 +85,6 @@ const Profile = () => {
           const newProfileUrl = await getDownloadURL(uploadTask.snapshot.ref);
           setProfileUrl(newProfileUrl);
           await updateProfileData({ imageUrl: newProfileUrl });
-
-          // Excluir imagem anterior do Firebase Storage
           if (previousProfileUrl) {
             const previousImageRef = ref(storage, previousProfileUrl);
             try {
@@ -97,8 +94,6 @@ const Profile = () => {
               console.error('Erro ao excluir a imagem anterior:', error);
             }
           }
-
-          // Atualizar a URL da imagem anterior
           setPreviousProfileUrl(newProfileUrl);
         }
       );
@@ -150,7 +145,6 @@ const Profile = () => {
     if (postImage) {
       const storageRef = ref(storage, `postImages/${user.uid}/${postImage.name}`);
       const uploadTask = uploadBytesResumable(storageRef, postImage);
-
       uploadTask.on(
         'state_changed',
         (snapshot) => {
@@ -214,13 +208,10 @@ const Profile = () => {
               height = MAX_HEIGHT;
             }
           }
-
           canvas.width = width;
           canvas.height = height;
-
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
-
           canvas.toBlob((blob) => {
             resolve(blob);
           }, file.type);
