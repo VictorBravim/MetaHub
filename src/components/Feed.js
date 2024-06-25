@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove, deleteDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getStorage, ref, deleteObject } from 'firebase/storage';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa';
 
 const Feed = () => {
@@ -11,6 +11,7 @@ const Feed = () => {
   const auth = getAuth();
   const storage = getStorage();
   const user = auth.currentUser;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -70,16 +71,20 @@ const Feed = () => {
     }
   };
 
+  const handleProfileRedirect = (userId) => {
+    navigate(`/profile/${userId}`);
+  };
+
   return (
     <div className="w-full h-full flex flex-col items-center justify-center bg-black text-white pt-32">
       {posts.map((post, index) => (
         <div key={index} className="w-full max-w-md flex flex-col items-center mb-6">
           {post.user && (
             <div className="w-full flex items-center mb-4 px-2">
-              <Link to={`/profile/${post.user.userId}`} className="flex items-center">
+              <div onClick={() => handleProfileRedirect(post.user.userId || post.user.uid)} className="flex items-center cursor-pointer">
                 <img src={post.user.imageUrl} alt="User Profile" className="w-12 h-12 rounded-full mr-4" />
                 <h3>@{post.user.username}</h3>
-              </Link>
+              </div>
             </div>
           )}
           {post.postImageUrl && <img src={post.postImageUrl} alt="User Post" className="w-full rounded-lg mb-4" />}

@@ -6,7 +6,6 @@ import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } f
 import ProfileCard from './ProfileCard';
 import PostModal from './PostModal';
 import Modal from 'react-modal';
-import FollowButton from './FollowButton'; 
 
 const Profile = () => {
   const { uid } = useParams(); 
@@ -314,7 +313,6 @@ const Profile = () => {
       {isProfileSet ? (
         <>
           <div className="profile-info flex flex-col justify-center items-center gap-2">
-            <FollowButton userId={uid} isProfileOwner={true} />
             <img src={profileUrl} alt="Profile" className="w-[10%] h-auto rounded-full" />
             <h3>{username}</h3>
             <button onClick={() => setModalIsOpen(true)}>Edit Profile</button>
