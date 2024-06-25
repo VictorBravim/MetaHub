@@ -47,7 +47,7 @@ const FollowButton = ({ userId, isProfileOwner }) => {
   };
 
   if (isProfileOwner) {
-    return null; // Não mostrar botão se for o próprio perfil
+    return null; 
   }
 
   return (

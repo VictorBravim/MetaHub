@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth, db } from '../firebase'; // Certifique-se de estar importando db corretamente
+import { auth, db } from '../firebase';
 import { doc, setDoc } from 'firebase/firestore';
 
 function Signup() {
@@ -13,17 +13,12 @@ function Signup() {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      // Cria o usuário no Firebase Authentication
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      
-      // Após criar o usuário com sucesso, salva os dados no Firestore
       await setDoc(doc(db, 'users', userCredential.user.uid), {
         email: userCredential.user.email,
-        username: '', // Defina um valor inicial para o username se necessário
-        imageUrl: '', // Defina um valor inicial para a imageUrl se necessário
+        username: '',
+        imageUrl: '',
       });
-
-      // Redireciona para a página de perfil após o cadastro
       navigate(`/profile/${userCredential.user.uid}`);
     } catch (error) {
       setError(error.message);

@@ -6,11 +6,11 @@ import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } f
 import ProfileCard from './ProfileCard';
 import PostModal from './PostModal';
 import Modal from 'react-modal';
-import FollowButton from './FollowButton'; // Importe o componente FollowButton aqui
+import FollowButton from './FollowButton'; 
 
 const Profile = () => {
-  const { uid } = useParams(); // Obtém o UID da URL
-  const [username, setUsername] = useState(''); // Defina o estado inicial de username
+  const { uid } = useParams(); 
+  const [username, setUsername] = useState('');
   const [profileImage, setProfileImage] = useState(null);
   const [profileUrl, setProfileUrl] = useState('');
   const [progress, setProgress] = useState(0);
@@ -78,11 +78,9 @@ const Profile = () => {
           await deleteObject(previousImageRef);
           console.log('Imagem anterior excluída com sucesso.');
         }
-
         const resizedImage = await resizeImage(profileImage);
         const storageRef = ref(storage, `profileImages/${uid}/${profileImage.name}`);
         const uploadTask = uploadBytesResumable(storageRef, resizedImage);
-
         uploadTask.on(
           'state_changed',
           (snapshot) => {
@@ -166,7 +164,6 @@ const Profile = () => {
         const resizedImage = await resizeImage(postImage);
         const storageRef = ref(storage, `postImages/${uid}/${postImage.name}`);
         const uploadTask = uploadBytesResumable(storageRef, resizedImage);
-
         uploadTask.on(
           'state_changed',
           (snapshot) => {
@@ -211,7 +208,6 @@ const Profile = () => {
     const postDoc = await getDoc(postRef);
     const post = postDoc.data();
     const userLiked = post.likedBy.includes(uid);
-
     try {
       if (userLiked) {
         await updateDoc(postRef, {
@@ -224,7 +220,6 @@ const Profile = () => {
           likeCount: post.likeCount + 1
         });
       }
-
       setPosts((prevPosts) =>
         prevPosts.map((p) =>
           p.id === postId
@@ -232,7 +227,6 @@ const Profile = () => {
             : p
         )
       );
-
       if (selectedPost && selectedPost.id === postId) {
         setSelectedPost((prevSelectedPost) => ({
           ...prevSelectedPost,
@@ -240,7 +234,6 @@ const Profile = () => {
           likeCount: userLiked ? prevSelectedPost.likeCount - 1 : prevSelectedPost.likeCount + 1
         }));
       }
-
     } catch (error) {
       console.error('Erro ao atualizar like:', error);
     }
@@ -249,7 +242,6 @@ const Profile = () => {
   const handleDeletePost = async (postId, postImageUrl) => {
     const postRef = doc(db, 'posts', postId);
     const imageRef = ref(storage, postImageUrl);
-
     try {
       await deleteDoc(postRef);
       await deleteObject(imageRef);
@@ -272,7 +264,6 @@ const Profile = () => {
           const MAX_HEIGHT = 1080;
           let width = img.width;
           let height = img.height;
-
           if (width > height) {
             if (width > MAX_WIDTH) {
               height *= MAX_WIDTH / width;
@@ -284,14 +275,11 @@ const Profile = () => {
               height = MAX_HEIGHT;
             }
           }
-
           const canvas = document.createElement('canvas');
           canvas.width = width;
           canvas.height = height;
-
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
-
           canvas.toBlob(
             (blob) => {
               resolve(blob);

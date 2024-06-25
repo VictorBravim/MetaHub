@@ -8,14 +8,10 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      // Realiza o login com email e senha
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      
-      // Redireciona para o perfil com o uid correspondente
       navigate(`/profile/${userCredential.user.uid}`);
     } catch (error) {
       setError(error.message);

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove, deleteDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getStorage, ref, deleteObject } from 'firebase/storage';
-import { Link } from 'react-router-dom'; // Importe o Link do React Router Dom
+import { Link } from 'react-router-dom';
 import { FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa';
 
 const Feed = () => {
@@ -25,7 +25,7 @@ const Feed = () => {
           return {
             id: postDoc.id,
             ...postData,
-            user: userData, // Certifique-se de que userData está sendo atribuído corretamente aqui
+            user: userData,
           };
         }));
         setPosts(postsList);
