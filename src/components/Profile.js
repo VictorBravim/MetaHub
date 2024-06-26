@@ -23,10 +23,12 @@ const Profile = () => {
   const [selectedPost, setSelectedPost] = useState(null);
   const [postModalIsOpen, setPostModalIsOpen] = useState(false);
   const [previousProfileUrl, setPreviousProfileUrl] = useState('');
+  const [isCurrentUser, setIsCurrentUser] = useState(false); // Adicione este estado
 
   const auth = getAuth();
   const db = getFirestore();
   const storage = getStorage();
+  const user = auth.currentUser;
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -37,7 +39,7 @@ const Profile = () => {
           const data = docSnap.data();
           setProfileUrl(data.imageUrl);
           setPreviousProfileUrl(data.imageUrl);
-          setUsername(data.username); // Defina o username aqui
+          setUsername(data.username);
           setIsProfileSet(!!data.imageUrl && !!data.username);
           if (!data.imageUrl || !data.username) {
             setModalIsOpen(true);
@@ -62,6 +64,14 @@ const Profile = () => {
     };
     fetchUserPosts();
   }, [uid, db]);
+
+  useEffect(() => {
+    if (user && user.uid === uid) {
+      setIsCurrentUser(true);
+    } else {
+      setIsCurrentUser(false);
+    }
+  }, [user, uid]);
 
   const handleProfileImageChange = (e) => {
     if (e.target.files[0]) {
@@ -315,13 +325,15 @@ const Profile = () => {
           <div className="profile-info flex flex-col justify-center items-center gap-2">
             <img src={profileUrl} alt="Profile" className="w-[10%] h-auto rounded-full" />
             <h3>{username}</h3>
-            <button onClick={() => setModalIsOpen(true)}>Edit Profile</button>
+            {isCurrentUser && <button onClick={() => setModalIsOpen(true)}>Edit Profile</button>}
           </div>
-          <div className="post-upload mt-4">
-            <input className='p-1 rounded-lg' type="file" onChange={handlePostImageChange} />
-            <button className='bg-white text-black p-1 rounded-md ml-4' onClick={handlePostUpload}>Publicar</button>
-            {postProgress > 0 && <progress value={postProgress} max="100" />}
-          </div>
+          {isCurrentUser && (
+            <div className="post-upload mt-4">
+              <input className='p-1 rounded-lg' type="file" onChange={handlePostImageChange} />
+              <button className='bg-white text-black p-1 rounded-md ml-4' onClick={handlePostUpload}>Publicar</button>
+              {postProgress > 0 && <progress value={postProgress} max="100" />}
+            </div>
+          )}
           <div className="post-grid">
             <div className="mx-32 grid grid-cols-4 gap-4">
               {posts.map((post, index) => (

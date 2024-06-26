@@ -2,7 +2,7 @@ import React from 'react';
 import Modal from 'react-modal';
 import { FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa';
 
-const PostModal = ({ isOpen, onRequestClose, post, onLike, onDelete, userLiked }) => {
+const PostModal = ({ isOpen, onRequestClose, post, onLike, onDelete, userLiked, currentUserId }) => {
     if (!post) return null;
 
     return (
@@ -19,9 +19,11 @@ const PostModal = ({ isOpen, onRequestClose, post, onLike, onDelete, userLiked }
                         {userLiked ? <FaHeart className="text-red-500 text-xl" /> : <FaRegHeart className="text-xl" />}
                     </button>
                     <span className="ml-2">{post.likeCount || 0}</span>
-                    <button onClick={() => onDelete(post.id, post.postImageUrl)} className="ml-4 text-red-600">
-                        <FaTrash className="text-xl" />
-                    </button>
+                    {post.userId === currentUserId && (
+                        <button onClick={() => onDelete(post.id, post.postImageUrl)} className="ml-4 text-red-600">
+                            <FaTrash className="text-xl" />
+                        </button>
+                    )}
                 </div>
             </div>
         </Modal>

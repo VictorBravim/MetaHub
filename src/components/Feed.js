@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove, deleteDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getStorage, ref, deleteObject } from 'firebase/storage';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa';
 
 const Feed = () => {
@@ -27,6 +27,7 @@ const Feed = () => {
             id: postDoc.id,
             ...postData,
             user: userData,
+            userId: postData.userId, // Adiciona o userId ao post
           };
         }));
         setPosts(postsList);
@@ -81,7 +82,7 @@ const Feed = () => {
         <div key={index} className="w-full max-w-md flex flex-col items-center mb-6">
           {post.user && (
             <div className="w-full flex items-center mb-4 px-2">
-              <div onClick={() => handleProfileRedirect(post.user.userId || post.user.uid)} className="flex items-center cursor-pointer">
+              <div onClick={() => handleProfileRedirect(post.userId)} className="flex items-center cursor-pointer">
                 <img src={post.user.imageUrl} alt="User Profile" className="w-12 h-12 rounded-full mr-4" />
                 <h3>@{post.user.username}</h3>
               </div>
