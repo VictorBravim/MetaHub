@@ -18,12 +18,11 @@ const Profile = () => {
   const [posts, setPosts] = useState([]);
   const [postImage, setPostImage] = useState(null);
   const [postProgress, setPostProgress] = useState(0);
-  const [postUrl, setPostUrl] = useState('');
   const [loading, setLoading] = useState(true);
   const [selectedPost, setSelectedPost] = useState(null);
   const [postModalIsOpen, setPostModalIsOpen] = useState(false);
   const [previousProfileUrl, setPreviousProfileUrl] = useState('');
-  const [isCurrentUser, setIsCurrentUser] = useState(false); // Adicione este estado
+  const [isCurrentUser, setIsCurrentUser] = useState(false); 
 
   const auth = getAuth();
   const db = getFirestore();
@@ -369,6 +368,7 @@ const Profile = () => {
         onLike={handleLikePost}
         onDelete={handleDeletePost}
         userLiked={selectedPost && selectedPost.likedBy.includes(uid)}
+        currentUserId={user.uid} // Passando currentUserId para o componente PostModal
       />
     </div>
   );
