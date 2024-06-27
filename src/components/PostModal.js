@@ -2,7 +2,6 @@ import React from 'react';
 import Modal from 'react-modal';
 import { FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa';
 
-// Configuração inicial do react-modal para definir o appElement
 if (typeof document !== 'undefined') {
   Modal.setAppElement('#root');
 }

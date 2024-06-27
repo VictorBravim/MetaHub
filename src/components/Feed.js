@@ -29,7 +29,7 @@ const Feed = () => {
             id: postDoc.id,
             ...postData,
             user: userData,
-            userId: postData.userId, // Adiciona o userId ao post
+            userId: postData.userId,
           };
         }));
         setPosts(postsList);
