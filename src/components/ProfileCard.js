@@ -8,7 +8,10 @@ const ProfileCard = ({ handleImageChange, handleUsernameChange, handleProfileSav
         <input 
           type="file" 
           onChange={handleImageChange} 
-          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" 
+          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          id="profile-image" // Adicionado id
+          name="profileImage" // Adicionado name
+          autoComplete="off" // Adicionado autocomplete
         />
       </div>
       <div className="mb-4">
@@ -18,6 +21,9 @@ const ProfileCard = ({ handleImageChange, handleUsernameChange, handleProfileSav
           onChange={handleUsernameChange}
           placeholder="Username"
           className="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+          id="username" // Adicionado id
+          name="username" // Adicionado name
+          autoComplete="username" // Adicionado autocomplete
         />
       </div>
       <div className="mb-4 text-center">

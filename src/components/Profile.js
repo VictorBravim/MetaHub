@@ -304,14 +304,17 @@ const Profile = () => {
   };
 
   const openPostModal = (post) => {
+    console.log("Abrindo modal:", post);
     setSelectedPost(post);
     setPostModalIsOpen(true);
   };
-
+  
   const closePostModal = () => {
+    console.log("Fechando modal");
     setPostModalIsOpen(false);
     setSelectedPost(null);
   };
+  
 
   if (loading) {
     return <p>Loading...</p>;
@@ -362,14 +365,14 @@ const Profile = () => {
         />
       </Modal>
       <PostModal
-        isOpen={postModalIsOpen}
-        onRequestClose={closePostModal}
-        post={selectedPost}
-        onLike={handleLikePost}
-        onDelete={handleDeletePost}
-        userLiked={selectedPost && selectedPost.likedBy.includes(uid)}
-        currentUserId={user.uid} // Passando currentUserId para o componente PostModal
-      />
+  isOpen={postModalIsOpen}
+  onRequestClose={closePostModal}
+  post={selectedPost}
+  onLike={handleLikePost}
+  onDelete={handleDeletePost}
+  userLiked={selectedPost && selectedPost.likedBy.includes(uid)}
+  currentUserId={user.uid}
+/>
     </div>
   );
 };
