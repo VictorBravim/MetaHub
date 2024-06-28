@@ -9,7 +9,7 @@ import Modal from 'react-modal';
 import FollowButton from './FollowButton';
 
 const Profile = () => {
-  const { uid } = useParams(); 
+  const { uid } = useParams();
   const [username, setUsername] = useState('');
   const [profileImage, setProfileImage] = useState(null);
   const [profileUrl, setProfileUrl] = useState('');
@@ -23,7 +23,7 @@ const Profile = () => {
   const [selectedPost, setSelectedPost] = useState(null);
   const [postModalIsOpen, setPostModalIsOpen] = useState(false);
   const [previousProfileUrl, setPreviousProfileUrl] = useState('');
-  const [isCurrentUser, setIsCurrentUser] = useState(false); 
+  const [isCurrentUser, setIsCurrentUser] = useState(false);
 
   const auth = getAuth();
   const db = getFirestore();
@@ -314,7 +314,7 @@ const Profile = () => {
     console.log("Fechando modal");
     setPostModalIsOpen(false);
     setSelectedPost(null);
-  };
+  };  
 
   if (loading) {
     return <p>Loading...</p>;
@@ -325,7 +325,7 @@ const Profile = () => {
       {isProfileSet ? (
         <>
           <div className="profile-info  flex flex-col justify-center items-center gap-2">
-            <img src={profileUrl} alt="Profile" className="w-[10%] h-auto rounded-full"  />
+            <img src={profileUrl} alt="Profile" className="w-[10%] h-auto rounded-full" />
             <h3>{username}</h3>
             {isCurrentUser && <button onClick={() => setModalIsOpen(true)}>Edit Profile</button>}
             {!isCurrentUser && <FollowButton userId={uid} isProfileOwner={false} />}
