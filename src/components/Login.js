@@ -8,6 +8,7 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -41,6 +42,12 @@ function Login() {
         <button type="submit" className='bg-white p-2 text-black rounded-lg'>Entrar</button>
       </form>
       {error && <p>{error}</p>}
+      <button
+        onClick={() => navigate('/signup')}
+        className='mt-4 text-blue-500'
+      >
+        Não tem uma conta? Signup
+      </button>
     </div>
   );
 }

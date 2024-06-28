@@ -48,6 +48,12 @@ function Signup() {
         <button type="submit" className='bg-white p-2 text-black rounded-lg'>Signup</button>
       </form>
       {error && <p>{error}</p>}
+      <button
+        onClick={() => navigate('/login')}
+        className='mt-4 text-blue-500'
+      >
+        Já tem uma conta? Login
+      </button>
     </div>
   );
 }

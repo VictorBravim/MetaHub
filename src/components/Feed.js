@@ -4,7 +4,6 @@ import { getAuth } from 'firebase/auth';
 import { getStorage, ref, deleteObject } from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
 import { FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa';
-import Modal from 'react-modal';
 
 const Feed = () => {
   const [posts, setPosts] = useState([]);
@@ -13,7 +12,6 @@ const Feed = () => {
   const storage = getStorage();
   const user = auth.currentUser;
   const navigate = useNavigate();
-  const [modalIsOpen, setModalIsOpen] = useState(false);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -78,14 +76,6 @@ const Feed = () => {
     navigate(`/profile/${userId}`);
   };
 
-  const openModal = () => {
-    setModalIsOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalIsOpen(false);
-  };
-
   return (
     <div className="w-full h-full flex flex-col items-center justify-center bg-black text-white pt-32">
       {posts.map((post, index) => (
@@ -112,15 +102,6 @@ const Feed = () => {
           </div>
         </div>
       ))}
-      <button onClick={openModal}>Open Modal</button>
-      <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={closeModal}
-        ariaHideApp={false}
-      >
-        <div>Content of the modal</div>
-        <button onClick={closeModal}>Close</button>
-      </Modal>
     </div>
   );
 };
