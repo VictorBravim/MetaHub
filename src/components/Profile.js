@@ -325,7 +325,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="h-screen w-full flex flex-col items-center bg-white text-black pt-12 lg:pl-28 bg-cover bg-center" style={{ backgroundImage: `url(${backgroundImage})`, backgroundAttachment: 'fixed' }}>
+    <div className="h-screen w-full flex flex-col items-center bg-white text-black pt-24 lg:pt-12 lg:pl-28 bg-cover bg-center" style={{ backgroundImage: `url(${backgroundImage})`, backgroundAttachment: 'fixed' }}>
       {isProfileSet ? (
         <>
           <div className="bg-blue-500 p-4 px-5 rounded-full text-white flex items-center justify-between gap-8 mx-8 my-4">

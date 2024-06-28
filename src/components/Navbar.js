@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { FaHome, FaUser, FaSignInAlt, FaSignOutAlt, FaUserPlus } from 'react-icons/fa';
 
 const Navbar = () => {
@@ -28,8 +27,8 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed h-screen bg-transparent text-white w-16 flex flex-col items-center justify-center pt-6">
-      <ul className="bg-blue-500 py-12 rounded-full ml-4 flex flex-col gap-3 w-full justify-center items-center">
+    <nav className="fixed top-0 md:left-0 pt-4 md:pl-4 md:h-screen bg-transparent text-white w-full md:w-16 flex md:flex-col items-center justify-center">
+      <ul className="bg-blue-500 py-4 md:py-12 rounded-full flex md:flex-col gap-3 w-full justify-around md:justify-center items-center">
         {currentUser ? (
           <>
             <li><Link to={`/profile/${uid}`} className='text-white hover:bg-white hover:text-blue-500 p-2 rounded-full flex'><FaUser size={20} /></Link></li>

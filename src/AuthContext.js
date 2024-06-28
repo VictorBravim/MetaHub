@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
         return unsubscribe;
       })
       .catch((error) => {
-        console.error("Error setting persistence: ", error);
+        console.error("Erro ao definir persistência: ", error);
       });
   }, []);
 

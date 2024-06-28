@@ -78,7 +78,7 @@ const Feed = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center bg-white pt-16 bg-cover bg-center" style={{ backgroundImage: `url(${backgroundImage})`, backgroundAttachment: 'fixed' }}>
+    <div className="w-full h-full flex flex-col items-center justify-center bg-white pt-28 lg:pt-16 bg-cover bg-center" style={{ backgroundImage: `url(${backgroundImage})`, backgroundAttachment: 'fixed' }}>
       {posts.map((post, index) => (
         <div key={index} className="w-full bg-blue-500 py-4 px-2 rounded-xl text-white max-w-md flex flex-col items-center mb-6">
           {post.user && (
