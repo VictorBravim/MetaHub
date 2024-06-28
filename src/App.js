@@ -13,7 +13,7 @@ const AppContent = () => {
   const hideNavbar = location.pathname === '/login' || location.pathname === '/signup';
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-white">
       {!hideNavbar && <Navbar />}
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />

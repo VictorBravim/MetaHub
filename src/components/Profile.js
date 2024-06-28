@@ -7,6 +7,8 @@ import ProfileCard from './ProfileCard';
 import PostModal from './PostModal';
 import Modal from 'react-modal';
 import FollowButton from './FollowButton';
+import { IoAddCircleOutline } from 'react-icons/io5';
+import { IoMdCreate } from 'react-icons/io';
 
 const Profile = () => {
   const { uid } = useParams();
@@ -161,13 +163,14 @@ const Profile = () => {
     }
   };
 
-  const handlePostImageChange = (e) => {
+  const handlePostImageChange = async (e) => {
     if (e.target.files[0]) {
       setPostImage(e.target.files[0]);
+      await handlePostUpload(e.target.files[0]);
     }
   };
 
-  const handlePostUpload = async () => {
+  const handlePostUpload = async (postImage) => {
     if (postImage) {
       try {
         const resizedImage = await resizeImage(postImage);
@@ -309,40 +312,50 @@ const Profile = () => {
     setSelectedPost(post);
     setPostModalIsOpen(true);
   };
-  
+
   const closePostModal = () => {
     console.log("Fechando modal");
     setPostModalIsOpen(false);
     setSelectedPost(null);
-  };  
+  };
 
   if (loading) {
     return <p>Loading...</p>;
   }
 
   return (
-    <div className="profile h-full w-full flex flex-col justify-center items-center bg-black text-white pt-32">
+    <div className="profile h-full w-full flex flex-col justify-center items-center bg-white text-black pt-32">
       {isProfileSet ? (
         <>
-          <div className="profile-info  flex flex-col justify-center items-center gap-2">
-            <img src={profileUrl} alt="Profile" className="w-[10%] h-auto rounded-full" />
-            <h3>{username}</h3>
-            {isCurrentUser && <button onClick={() => setModalIsOpen(true)}>Edit Profile</button>}
-            {!isCurrentUser && <FollowButton userId={uid} isProfileOwner={false} />}
-            {isCurrentUser && <FollowButton userId={uid} isProfileOwner={true} />}
+          <div className="profile-info flex items-center justify-between gap-8 mx-8 my-4">
+            <img src={profileUrl} alt="Profile" className="w-20 h-20 rounded-full object-cover" />
+            <div className="flex flex-col items-start">
+              <div className="flex gap-4 mt-2">
+                <h3 className="text-xl">@{username}</h3>
+                {isCurrentUser && <button className=" text-black p-1 flex items-center" onClick={() => setModalIsOpen(true)}>
+                  <IoMdCreate />
+                </button>}
+              </div>
+              {isCurrentUser ? (
+                <FollowButton userId={uid} isProfileOwner={true} />
+              ) : (
+                <FollowButton userId={uid} isProfileOwner={false} />
+              )}
+            </div>
           </div>
           {isCurrentUser && (
-            <div className="post-upload mt-4">
-              <input className='p-1 rounded-lg' type="file" onChange={handlePostImageChange} />
-              <button className='bg-white text-black p-1 rounded-md ml-4' onClick={handlePostUpload}>Publicar</button>
-              {postProgress > 0 && <progress value={postProgress} max="100" />}
+            <div className="fixed flex bottom-8 left-1/2 transform -translate-x-1/2">
+              <label htmlFor="file-upload" className="rounded-full bg-blue-500 p-2 cursor-pointer">
+                <IoAddCircleOutline className="text-white text-3xl" />
+                <input id="file-upload" className="hidden" type="file" onChange={handlePostImageChange} />
+              </label>
             </div>
           )}
-          <div className="post-grid">
-            <div className="mx-32 grid grid-cols-4 gap-4">
+          <div className="post-grid mx-12 mt-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {posts.map((post, index) => (
-                <div key={index} className="post-item" onClick={() => openPostModal(post)}>
-                  <img src={post.postImageUrl} alt="User Post" className="w-full h-auto" />
+                <div key={index} className="post-item cursor-pointer" onClick={() => openPostModal(post)}>
+                  <img src={post.postImageUrl} alt="User Post" className="w-full h-auto rounded-lg" />
                 </div>
               ))}
             </div>
