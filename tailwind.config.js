@@ -6,7 +6,7 @@ module.exports = {
   theme: {
     extend: {
       boxShadow: {
-        'neomorph': '8px 8px 16px #d1d9e6, -8px -8px 16px #ffffff',
+        'neomorph': '9px 9px 18px #d1d9e6, -9px -9px 18px #ffffff',
         'neomorph-inner': 'inset 8px 8px 16px #d1d9e6, inset -8px -8px 16px #ffffff',
       },
       colors: {
