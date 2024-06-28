@@ -6,6 +6,7 @@ import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } f
 import ProfileCard from './ProfileCard';
 import PostModal from './PostModal';
 import Modal from 'react-modal';
+import FollowButton from './FollowButton'; // Importe o componente FollowButton
 
 const Profile = () => {
   const { uid } = useParams(); 
@@ -314,7 +315,6 @@ const Profile = () => {
     setPostModalIsOpen(false);
     setSelectedPost(null);
   };
-  
 
   if (loading) {
     return <p>Loading...</p>;
@@ -328,6 +328,7 @@ const Profile = () => {
             <img src={profileUrl} alt="Profile" className="w-[10%] h-auto rounded-full" />
             <h3>{username}</h3>
             {isCurrentUser && <button onClick={() => setModalIsOpen(true)}>Edit Profile</button>}
+            {!isCurrentUser && <FollowButton userId={uid} />}
           </div>
           {isCurrentUser && (
             <div className="post-upload mt-4">
@@ -365,14 +366,14 @@ const Profile = () => {
         />
       </Modal>
       <PostModal
-  isOpen={postModalIsOpen}
-  onRequestClose={closePostModal}
-  post={selectedPost}
-  onLike={handleLikePost}
-  onDelete={handleDeletePost}
-  userLiked={selectedPost && selectedPost.likedBy.includes(uid)}
-  currentUserId={user.uid}
-/>
+        isOpen={postModalIsOpen}
+        onRequestClose={closePostModal}
+        post={selectedPost}
+        onLike={handleLikePost}
+        onDelete={handleDeletePost}
+        userLiked={selectedPost && selectedPost.likedBy.includes(uid)}
+        currentUserId={user.uid}
+      />
     </div>
   );
 };

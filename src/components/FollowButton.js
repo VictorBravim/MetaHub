@@ -16,8 +16,13 @@ const FollowButton = ({ userId, isProfileOwner }) => {
         const userDocSnap = await getDoc(userDocRef);
         if (userDocSnap.exists()) {
           const userData = userDocSnap.data();
-          setFollowersCount(userData.followers.length);
-          setIsFollowing(userData.followers.includes(user.uid));
+          if (userData.followers) {
+            setFollowersCount(userData.followers.length);
+            setIsFollowing(userData.followers.includes(user.uid));
+          } else {
+            setFollowersCount(0);
+            setIsFollowing(false);
+          }
         }
       } catch (error) {
         console.error('Erro ao buscar status de seguir:', error);
