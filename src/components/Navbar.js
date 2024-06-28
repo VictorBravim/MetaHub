@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { FaHome, FaUser, FaSignInAlt, FaSignOutAlt, FaUserPlus } from 'react-icons/fa';
 
 const Navbar = () => {
   const { currentUser, logout } = useAuth();
@@ -27,18 +28,18 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed w-full py-6 bg-black text-white flex flex-row items-center justify-center">
-      <ul className="flex gap-3">
+    <nav className="fixed h-full bg-black text-white w-16 flex flex-col items-center justify-start pt-6">
+      <ul className="flex flex-col gap-3 w-full">
         {currentUser ? (
           <>
-            <li><Link to="/feed"><button className='bg-white text-black p-2 rounded-lg'>Feed</button></Link></li>
-            <li><Link to={`/profile/${uid}`}><button className='bg-white text-black p-2 rounded-lg'>Profile</button></Link></li>
-            <li><button onClick={handleLogout} className='bg-white text-black p-2 rounded-lg'>Logout</button></li>
+            <li><Link to="/feed" className='text-white hover:bg-white hover:text-black p-2 rounded-lg flex'><FaHome size={20} /></Link></li>
+            <li><Link to={`/profile/${uid}`} className='text-white hover:bg-white hover:text-black p-2 rounded-lg flex'><FaUser size={20} /></Link></li>
+            <li><button onClick={handleLogout} className='text-white hover:bg-white hover:text-black p-2 rounded-lg'><FaSignOutAlt size={20} /></button></li>
           </>
         ) : (
           <>
-            <li><Link to="/login"><button className='bg-white text-black p-2 rounded-lg'>Login</button></Link></li>
-            <li><Link to="/signup"><button className='bg-white text-black p-2 rounded-lg'>Signup</button></Link></li>
+            <li><Link to="/login" className='text-white hover:bg-white hover:text-black p-2 rounded-lg'><FaSignInAlt size={20} /></Link></li>
+            <li><Link to="/signup" className='text-white hover:bg-white hover:text-black p-2 rounded-lg'><FaUserPlus size={20} /></Link></li>
           </>
         )}
       </ul>

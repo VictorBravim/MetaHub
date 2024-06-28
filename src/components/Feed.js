@@ -77,7 +77,7 @@ const Feed = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center bg-black text-white pt-32">
+    <div className="w-full h-full flex flex-col items-center justify-center bg-white text-black pt-32">
       {posts.map((post, index) => (
         <div key={index} className="w-full max-w-md flex flex-col items-center mb-6">
           {post.user && (
