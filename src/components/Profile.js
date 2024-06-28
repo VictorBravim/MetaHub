@@ -324,7 +324,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="profile h-full w-full flex flex-col justify-center items-center bg-white text-black pt-12 ml-16">
+    <div className="profile h-full w-full flex flex-col justify-center items-center bg-white text-black pt-12 pl-28">
       {isProfileSet ? (
         <>
           <div className="profile-info flex items-center justify-between gap-8 mx-8 my-4">

@@ -28,12 +28,12 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed h-full bg-black text-white w-16 flex flex-col items-center justify-start pt-6">
-      <ul className="flex flex-col gap-3 w-full">
+    <nav className="fixed h-screen bg-transparent text-white w-16 flex flex-col items-center justify-center pt-6">
+      <ul className="bg-black py-12 rounded-full ml-4 flex flex-col gap-3 w-full justify-center items-center">
         {currentUser ? (
           <>
-            <li><Link to="/feed" className='text-white hover:bg-white hover:text-black p-2 rounded-lg flex'><FaHome size={20} /></Link></li>
             <li><Link to={`/profile/${uid}`} className='text-white hover:bg-white hover:text-black p-2 rounded-lg flex'><FaUser size={20} /></Link></li>
+            <li><Link to="/feed" className='text-white hover:bg-white hover:text-black p-2 rounded-lg flex'><FaHome size={20} /></Link></li>
             <li><button onClick={handleLogout} className='text-white hover:bg-white hover:text-black p-2 rounded-lg'><FaSignOutAlt size={20} /></button></li>
           </>
         ) : (
