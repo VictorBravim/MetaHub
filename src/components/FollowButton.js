@@ -63,7 +63,7 @@ const FollowButton = ({ userId, isProfileOwner }) => {
             {followersCount} Seguidores
           </div>
           <button onClick={handleFollowToggle}>
-            {isFollowing ? 'Deixar de seguir' : 'Seguir'}
+            {isFollowing ? 'Unfollow' : 'Follow'}
           </button>
         </>
       )}

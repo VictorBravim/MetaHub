@@ -4,6 +4,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { FaUserPlus } from 'react-icons/fa';
+import backgroundImage from '../assets/bg.png';
 
 function Signup() {
   const [email, setEmail] = useState('');
@@ -27,14 +28,14 @@ function Signup() {
   };
 
   return (
-    <div className="h-screen w-full bg-gray-100 flex flex-col justify-center items-center">
+    <div className="h-screen w-full bg-gray-100 flex flex-col justify-center items-center bg-cover bg-center" style={{ backgroundImage: `url(${backgroundImage})` }}>
       <div className="bg-white p-8 rounded-lg shadow-neomorph w-96">
         <div className="flex justify-center mb-4">
           <div className="bg-white p-4 rounded-full shadow-neomorph-inner">
             <FaUserPlus className="text-blue-500 text-6xl" />
           </div>
         </div>
-        <h2 className="mb-8 text-3xl font-bold text-blue-500 text-center">SIGNUP</h2>
+        <h2 className="mb-8 text-3xl font-bold text-blue-500 text-center">Signup</h2>
         <form className="flex flex-col gap-6" onSubmit={handleSignup}>
           <input
             className="p-4 rounded-lg bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-neomorph-inner"
@@ -56,7 +57,7 @@ function Signup() {
             type="submit"
             className="p-4 bg-blue-500 text-white rounded-lg shadow-neomorph focus:outline-none focus:ring-2 focus:ring-blue-700 hover:bg-blue-600 transition-all"
           >
-            REGISTRAR
+            Registrar
           </button>
         </form>
         {error && <p className="mt-4 text-red-500 text-center">{error}</p>}

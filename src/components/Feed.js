@@ -77,9 +77,9 @@ const Feed = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center bg-white text-black pt-32">
+    <div className="w-full h-full flex flex-col items-center justify-center bg-white pt-16">
       {posts.map((post, index) => (
-        <div key={index} className="w-full max-w-md flex flex-col items-center mb-6">
+        <div key={index} className="w-full bg-black py-4 px-2 rounded-xl text-white max-w-md flex flex-col items-center mb-6">
           {post.user && (
             <div className="w-full flex items-center mb-4 px-2">
               <div onClick={() => handleProfileRedirect(post.userId)} className="flex items-center cursor-pointer">
