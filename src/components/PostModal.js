@@ -7,14 +7,14 @@ if (typeof document !== 'undefined') {
 }
 
 const PostModal = ({ isOpen, onRequestClose, post, onLike, onDelete, userLiked, currentUserId }) => {
-    if (!post) return null;
+  if (!post) return null;
 
   return (
     <Modal
-    isOpen={isOpen}
-    onRequestClose={onRequestClose}
-    className="post-modal bg-blue-500 rounded-lg p-6 max-w-lg mx-auto mt-20"
-    overlayClassName="fixed inset-0 bg-black bg-opacity-90"
+      isOpen={isOpen}
+      onRequestClose={onRequestClose}
+      className="post-modal bg-blue-500 rounded-lg p-6 max-w-lg mx-auto mt-20"
+      overlayClassName="fixed inset-0 bg-black bg-opacity-90"
     >
       <div className="post-modal-content flex flex-col justify-center items-center text-white">
         <img src={post.postImageUrl} alt="Post" className="w-full h-auto rounded-lg mb-4" />

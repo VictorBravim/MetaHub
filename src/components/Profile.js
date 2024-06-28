@@ -217,10 +217,28 @@ const Profile = () => {
   };
 
   const handleLikePost = async (postId) => {
+    if (!postId) {
+      console.error('Invalid postId');
+      return;
+    }
+
     const postRef = doc(db, 'posts', postId);
     const postDoc = await getDoc(postRef);
+
+    if (!postDoc.exists()) {
+      console.error('Post does not exist');
+      return;
+    }
+
     const post = postDoc.data();
+
+    if (!post || !post.likedBy) {
+      console.error('Invalid post data');
+      return;
+    }
+
     const userLiked = post.likedBy.includes(uid);
+
     try {
       if (userLiked) {
         await updateDoc(postRef, {
@@ -233,6 +251,7 @@ const Profile = () => {
           likeCount: post.likeCount + 1
         });
       }
+
       setPosts((prevPosts) =>
         prevPosts.map((p) =>
           p.id === postId
@@ -240,6 +259,7 @@ const Profile = () => {
             : p
         )
       );
+
       if (selectedPost && selectedPost.id === postId) {
         setSelectedPost((prevSelectedPost) => ({
           ...prevSelectedPost,
@@ -252,7 +272,12 @@ const Profile = () => {
     }
   };
 
+
   const handleDeletePost = async (postId, postImageUrl) => {
+    if (!postImageUrl) {
+      console.error('postImageUrl is undefined');
+      return;
+    }
     const postRef = doc(db, 'posts', postId);
     const imageRef = ref(storage, postImageUrl);
     try {
@@ -273,21 +298,8 @@ const Profile = () => {
         const img = new Image();
         img.src = event.target.result;
         img.onload = () => {
-          const MAX_WIDTH = 1080;
-          const MAX_HEIGHT = 1080;
-          let width = img.width;
-          let height = img.height;
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height *= MAX_WIDTH / width;
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width *= MAX_HEIGHT / height;
-              height = MAX_HEIGHT;
-            }
-          }
+          const width = 1080;
+          const height = 1080;
           const canvas = document.createElement('canvas');
           canvas.width = width;
           canvas.height = height;
@@ -307,6 +319,7 @@ const Profile = () => {
       };
     });
   };
+
 
   const openPostModal = (post) => {
     console.log("Abrindo modal:", post);
@@ -328,9 +341,9 @@ const Profile = () => {
     <div className="h-screen w-full flex flex-col items-center bg-white text-black pt-24 lg:pt-12 lg:pl-28 bg-cover bg-center" style={{ backgroundImage: `url(${backgroundImage})`, backgroundAttachment: 'fixed' }}>
       {isProfileSet ? (
         <>
-          <div className="bg-blue-500 p-4 px-5 rounded-full text-white flex items-center justify-between gap-8 mx-8 my-4">
+          <div className="bg-blue-500 p-4 px-6 rounded-full text-white flex items-center justify-between gap-6 mx-8 my-4">
             <img src={profileUrl} alt="Profile" className="w-20 h-20 rounded-full object-cover" />
-            <div className="flex flex-col items-start justify-center">
+            <div className="flex flex-col items-start justify-center mr-2">
               <div className="flex gap-4">
                 <h3 className="text-xl">@{username}</h3>
                 {isCurrentUser && <button className=" text-white p-1 flex items-center" onClick={() => setModalIsOpen(true)}>
@@ -345,7 +358,7 @@ const Profile = () => {
             </div>
           </div>
           {isCurrentUser && (
-            <div className="fixed flex bottom-8 left-1/2 transform -translate-x-1/2">
+            <div className="fixed flex bottom-8 left-1/1 transform -translate-x-1/3">
               <label htmlFor="file-upload" className="rounded-full bg-blue-500 p-2 cursor-pointer">
                 <IoAddCircleOutline className="text-white text-3xl" />
                 <input id="file-upload" className="hidden" type="file" onChange={handlePostImageChange} />
