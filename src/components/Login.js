@@ -20,11 +20,11 @@ function Login() {
   };
 
   return (
-    <div className="h-screen w-full bg-black text-white flex flex-col justify-center items-center">
-      <h2 className='mb-4 text-2xl'>Login</h2>
-      <form className='flex flex-col gap-6' onSubmit={handleLogin}>
+    <div className="h-screen w-full bg-gray-100 flex flex-col justify-center items-center">
+      <h2 className="mb-8 text-3xl font-bold text-gray-900">Login</h2>
+      <form className="flex flex-col gap-6" onSubmit={handleLogin}>
         <input
-          className='rounded-lg p-2 text-black'
+          className="p-4 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-neomorph-inner"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -32,19 +32,24 @@ function Login() {
           required
         />
         <input
-          className='rounded-lg p-2 text-black'
+          className="p-4 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-neomorph-inner"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
           required
         />
-        <button type="submit" className='bg-white p-2 text-black rounded-lg'>Entrar</button>
+        <button
+          type="submit"
+          className="p-4 bg-blue-500 text-white rounded-lg shadow-neomorph focus:outline-none focus:ring-2 focus:ring-blue-700 hover:bg-blue-600 transition-all"
+        >
+          Entrar
+        </button>
       </form>
-      {error && <p>{error}</p>}
+      {error && <p className="mt-4 text-red-500">{error}</p>}
       <button
         onClick={() => navigate('/signup')}
-        className='mt-4 text-blue-500'
+        className="mt-8 text-blue-500 hover:underline"
       >
         Não tem uma conta? Signup
       </button>
