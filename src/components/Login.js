@@ -22,7 +22,7 @@ function Login() {
   };
 
   return (
-    <div className="h-screen w-full flex flex-col justify-center items-center bg-cover bg-center" style={{ backgroundImage: `url(${backgroundImage})` }}>
+    <div className="h-screen w-full flex flex-col justify-center items-center bg-cover bg-center" style={{ backgroundImage: `url(${backgroundImage})`, backgroundAttachment: 'fixed' }}>
       <div className="bg-white p-8 rounded-lg shadow-neomorph w-96">
         <div className="flex justify-center mb-4">
           <div className="bg-white p-4 rounded-full shadow-neomorph-inner">

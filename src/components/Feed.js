@@ -4,6 +4,7 @@ import { getAuth } from 'firebase/auth';
 import { getStorage, ref, deleteObject } from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
 import { FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa';
+import backgroundImage from '../assets/bg-2.png';
 
 const Feed = () => {
   const [posts, setPosts] = useState([]);
@@ -77,9 +78,9 @@ const Feed = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center bg-white pt-16">
+    <div className="w-full h-full flex flex-col items-center justify-center bg-white pt-16 bg-cover bg-center" style={{ backgroundImage: `url(${backgroundImage})`, backgroundAttachment: 'fixed' }}>
       {posts.map((post, index) => (
-        <div key={index} className="w-full bg-black py-4 px-2 rounded-xl text-white max-w-md flex flex-col items-center mb-6">
+        <div key={index} className="w-full bg-blue-500 py-4 px-2 rounded-xl text-white max-w-md flex flex-col items-center mb-6">
           {post.user && (
             <div className="w-full flex items-center mb-4 px-2">
               <div onClick={() => handleProfileRedirect(post.userId)} className="flex items-center cursor-pointer">

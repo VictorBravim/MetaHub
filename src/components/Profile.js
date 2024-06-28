@@ -9,6 +9,7 @@ import Modal from 'react-modal';
 import FollowButton from './FollowButton';
 import { IoAddCircleOutline } from 'react-icons/io5';
 import { IoMdCreate } from 'react-icons/io';
+import backgroundImage from '../assets/bg-2.png';
 
 const Profile = () => {
   const { uid } = useParams();
@@ -324,15 +325,15 @@ const Profile = () => {
   }
 
   return (
-    <div className="h-full w-full flex flex-col justify-center items-center bg-white text-black pt-12 lg:pl-28">
+    <div className="h-screen w-full flex flex-col items-center bg-white text-black pt-12 lg:pl-28 bg-cover bg-center" style={{ backgroundImage: `url(${backgroundImage})`, backgroundAttachment: 'fixed' }}>
       {isProfileSet ? (
         <>
-          <div className="bg-black p-4 px-5 rounded-full text-white flex items-center justify-between gap-8 mx-8 my-4">
+          <div className="bg-blue-500 p-4 px-5 rounded-full text-white flex items-center justify-between gap-8 mx-8 my-4">
             <img src={profileUrl} alt="Profile" className="w-20 h-20 rounded-full object-cover" />
             <div className="flex flex-col items-start justify-center">
               <div className="flex gap-4">
                 <h3 className="text-xl">@{username}</h3>
-                {isCurrentUser && <button className=" text-black p-1 flex items-center" onClick={() => setModalIsOpen(true)}>
+                {isCurrentUser && <button className=" text-white p-1 flex items-center" onClick={() => setModalIsOpen(true)}>
                   <IoMdCreate />
                 </button>}
               </div>
@@ -345,7 +346,7 @@ const Profile = () => {
           </div>
           {isCurrentUser && (
             <div className="fixed flex bottom-8 left-1/2 transform -translate-x-1/2">
-              <label htmlFor="file-upload" className="rounded-full bg-black p-2 cursor-pointer">
+              <label htmlFor="file-upload" className="rounded-full bg-blue-500 p-2 cursor-pointer">
                 <IoAddCircleOutline className="text-white text-3xl" />
                 <input id="file-upload" className="hidden" type="file" onChange={handlePostImageChange} />
               </label>
@@ -354,7 +355,7 @@ const Profile = () => {
           <div className="post-grid mx-12 mt-12">
             <div className="p-6 rounded-lg grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {posts.map((post, index) => (
-                <div key={index} className="bg-black p-2 rounded-lg post-item cursor-pointer" onClick={() => openPostModal(post)}>
+                <div key={index} className="bg-blue-500 p-2 rounded-lg post-item cursor-pointer" onClick={() => openPostModal(post)}>
                   <img src={post.postImageUrl} alt="User Post" className="w-full h-auto rounded-lg" />
                 </div>
               ))}
