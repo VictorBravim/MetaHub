@@ -2,7 +2,7 @@ import React from 'react';
 
 const ProfileCard = ({ handleImageChange, handleUsernameChange, handleProfileSave, progress, imageUrl, username }) => {
   return (
-    <div className="max-w-md mx-auto bg-black text-white rounded-lg overflow-hidden mt-10 p-6">
+    <div className="max-w-md mx-auto bg-white text-black rounded-lg overflow-hidden mt-10 p-6">
       <h3 className="text-2xl font-semibold text-center mb-4">Configure seu perfil</h3>
       <div className="mb-4">
         <input 
@@ -20,7 +20,7 @@ const ProfileCard = ({ handleImageChange, handleUsernameChange, handleProfileSav
           value={username}
           onChange={handleUsernameChange}
           placeholder="Username"
-          className="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+          className="w-full shadow-neomorph-inner px-3 py-2 text-black border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           id="username" 
           name="username"
           autoComplete="username"
@@ -29,7 +29,7 @@ const ProfileCard = ({ handleImageChange, handleUsernameChange, handleProfileSav
       <div className="mb-4 text-center">
         <button 
           onClick={handleProfileSave} 
-          className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300"
+          className="w-full shadow-neomorph py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition duration-300"
         >
           Save
         </button>
@@ -46,7 +46,7 @@ const ProfileCard = ({ handleImageChange, handleUsernameChange, handleProfileSav
           <img 
             src={imageUrl} 
             alt="Profile Preview" 
-            className="inline-block w-24 h-24 rounded-full border-2 border-blue-600 object-cover mt-4"
+            className="inline-block shadow-neomorph w-24 h-24 rounded-full border-2 border-blue-500 object-cover mt-4"
           />
         </div>
       )}
