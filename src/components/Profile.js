@@ -6,7 +6,7 @@ import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } f
 import ProfileCard from './ProfileCard';
 import PostModal from './PostModal';
 import Modal from 'react-modal';
-import FollowButton from './FollowButton'; // Importe o componente FollowButton
+import FollowButton from './FollowButton';
 
 const Profile = () => {
   const { uid } = useParams(); 
@@ -324,11 +324,12 @@ const Profile = () => {
     <div className="profile h-full w-full flex flex-col justify-center items-center bg-black text-white pt-32">
       {isProfileSet ? (
         <>
-          <div className="profile-info flex flex-col justify-center items-center gap-2">
-            <img src={profileUrl} alt="Profile" className="w-[10%] h-auto rounded-full" />
+          <div className="profile-info  flex flex-col justify-center items-center gap-2">
+            <img src={profileUrl} alt="Profile" className="w-[10%] h-auto rounded-full"  />
             <h3>{username}</h3>
             {isCurrentUser && <button onClick={() => setModalIsOpen(true)}>Edit Profile</button>}
-            {!isCurrentUser && <FollowButton userId={uid} />}
+            {!isCurrentUser && <FollowButton userId={uid} isProfileOwner={false} />}
+            {isCurrentUser && <FollowButton userId={uid} isProfileOwner={true} />}
           </div>
           {isCurrentUser && (
             <div className="post-upload mt-4">

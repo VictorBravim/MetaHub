@@ -7,7 +7,7 @@ const FollowButton = ({ userId, isProfileOwner }) => {
   const [followersCount, setFollowersCount] = useState(0);
   const db = getFirestore();
   const auth = getAuth();
-  const user = auth.currentUser;
+  const currentUser = auth.currentUser;
 
   useEffect(() => {
     const fetchFollowStatus = async () => {
@@ -18,7 +18,7 @@ const FollowButton = ({ userId, isProfileOwner }) => {
           const userData = userDocSnap.data();
           if (userData.followers) {
             setFollowersCount(userData.followers.length);
-            setIsFollowing(userData.followers.includes(user.uid));
+            setIsFollowing(userData.followers.includes(currentUser.uid));
           } else {
             setFollowersCount(0);
             setIsFollowing(false);
@@ -29,19 +29,19 @@ const FollowButton = ({ userId, isProfileOwner }) => {
       }
     };
     fetchFollowStatus();
-  }, [db, userId, user]);
+  }, [db, userId, currentUser]);
 
   const handleFollowToggle = async () => {
     try {
       const userDocRef = doc(db, 'users', userId);
       if (isFollowing) {
         await updateDoc(userDocRef, {
-          followers: arrayRemove(user.uid)
+          followers: arrayRemove(currentUser.uid)
         });
         setFollowersCount(prevCount => prevCount - 1);
       } else {
         await updateDoc(userDocRef, {
-          followers: arrayUnion(user.uid)
+          followers: arrayUnion(currentUser.uid)
         });
         setFollowersCount(prevCount => prevCount + 1);
       }
@@ -51,16 +51,22 @@ const FollowButton = ({ userId, isProfileOwner }) => {
     }
   };
 
-  if (isProfileOwner) {
-    return null; 
-  }
-
   return (
     <div className="follow-button">
-      <button onClick={handleFollowToggle}>
-        {isFollowing ? 'Deixar de seguir' : 'Seguir'}
-      </button>
-      <span className="followers-count">{followersCount} Seguidores</span>
+      {isProfileOwner ? (
+        <div className="followers-count">
+          {followersCount} Seguidores
+        </div>
+      ) : (
+        <>
+          <div className="followers-count">
+            {followersCount} Seguidores
+          </div>
+          <button onClick={handleFollowToggle}>
+            {isFollowing ? 'Deixar de seguir' : 'Seguir'}
+          </button>
+        </>
+      )}
     </div>
   );
 };
