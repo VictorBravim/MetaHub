@@ -17,7 +17,7 @@ MetaHub is a social media application built using React and Firebase. The platfo
 
 1. Clone the repository:
 
-```
+``` 
 git clone https://github.com/VictorBravim/MetaHub.git
 ```
 
